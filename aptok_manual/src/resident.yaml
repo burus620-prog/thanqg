@@ -1,0 +1,188 @@
+# 아파트ok 사용자 매뉴얼 원본 — 입주자관리
+# 화면 7개. draft: true 인 항목은 화면 확인 전 뼈대이며,
+# 캡처를 본 뒤 purpose·steps·cautions·faq 를 채운다.
+
+- screen_id: res-household
+  screen_name: 세대관리
+  path: 입주자관리 > 세대관리
+  pattern: A
+  inherits: pattern-a
+  permission: 입주자관리 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: 세대별 입주자 정보를 관리한다
+
+  steps:
+    - no: 1
+      action: 상단 [입주자관리]를 클릭한 뒤 왼쪽 목록에서 [세대관리]를 클릭합니다.
+      target: nav:입주자관리 > side:세대관리
+      image: res-household-01.png
+      note: null
+    - no: 2
+      action: 검색·기간·내려받기 등 기본 조작은 [목록 화면 공통 사용법]을 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    - "개인정보가 표시되는 화면입니다. 열람 권한을 꼭 필요한 직원에게만 주세요."
+
+  faq: []
+
+  privacy_note: 캡처 시 이름·동호수·연락처를 가린다.
+
+---
+
+- screen_id: res-arrears
+  screen_name: 체납세대
+  path: 입주자관리 > 체납세대
+  pattern: D
+  permission: 입주자관리 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: 관리비를 내지 않은 세대를 조회한다
+
+  steps:
+    - no: 1
+      action: 상단 [입주자관리]를 클릭한 뒤 왼쪽 목록에서 [체납세대]를 클릭합니다.
+      target: nav:입주자관리 > side:체납세대
+      image: res-arrears-01.png
+      note: null
+
+  cautions:
+    - "개인정보가 표시되는 화면입니다. 열람 권한을 꼭 필요한 직원에게만 주세요."
+
+  faq: []
+
+  privacy_note: 캡처 시 이름·동호수·연락처를 가린다.
+
+---
+
+- screen_id: res-council-list
+  screen_name: 입주자대표회의 명단
+  path: 입주자관리 > 입주자대표회의 > 명단
+  pattern: E
+  permission: 입주자관리 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: 입주자대표회의 구성원 명단을 관리한다
+
+  steps:
+    - no: 1
+      action: 상단 [입주자관리]를 클릭한 뒤 왼쪽 목록에서 [입주자대표회의]를 클릭하고 [명단]를 클릭합니다.
+      target: nav:입주자관리 > side:입주자대표회의 > side:명단
+      image: res-council-list-01.png
+      note: null
+
+  cautions:
+    - "개인정보가 표시되는 화면입니다. 열람 권한을 꼭 필요한 직원에게만 주세요."
+
+  faq: []
+
+  privacy_note: 캡처 시 이름·동호수·연락처를 가린다.
+
+---
+
+- screen_id: res-council-minutes
+  screen_name: 입주자대표회의 회의록
+  path: 입주자관리 > 입주자대표회의 > 회의록
+  pattern: A
+  inherits: pattern-a
+  permission: 입주자관리 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: 회의록을 작성하고 보관한다
+
+  steps:
+    - no: 1
+      action: 상단 [입주자관리]를 클릭한 뒤 왼쪽 목록에서 [입주자대표회의]를 클릭하고 [회의록]를 클릭합니다.
+      target: nav:입주자관리 > side:입주자대표회의 > side:회의록
+      image: res-council-minutes-01.png
+      note: null
+    - no: 2
+      action: 검색·기간·내려받기 등 기본 조작은 [목록 화면 공통 사용법]을 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+
+  faq: []
+
+---
+
+- screen_id: res-election-list
+  screen_name: 선거관리위원회 명단
+  path: 입주자관리 > 선거관리위원회 > 명단
+  pattern: E
+  permission: 입주자관리 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: 선거관리위원회 구성원 명단을 관리한다
+
+  steps:
+    - no: 1
+      action: 상단 [입주자관리]를 클릭한 뒤 왼쪽 목록에서 [선거관리위원회]를 클릭하고 [명단]를 클릭합니다.
+      target: nav:입주자관리 > side:선거관리위원회 > side:명단
+      image: res-election-list-01.png
+      note: null
+
+  cautions:
+    - "개인정보가 표시되는 화면입니다. 열람 권한을 꼭 필요한 직원에게만 주세요."
+
+  faq: []
+
+  privacy_note: 캡처 시 이름·동호수·연락처를 가린다.
+
+---
+
+- screen_id: res-election-minutes
+  screen_name: 선거관리위원회 회의록
+  path: 입주자관리 > 선거관리위원회 > 회의록
+  pattern: A
+  inherits: pattern-a
+  permission: 입주자관리 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: 회의록을 작성하고 보관한다
+
+  steps:
+    - no: 1
+      action: 상단 [입주자관리]를 클릭한 뒤 왼쪽 목록에서 [선거관리위원회]를 클릭하고 [회의록]를 클릭합니다.
+      target: nav:입주자관리 > side:선거관리위원회 > side:회의록
+      image: res-election-minutes-01.png
+      note: null
+    - no: 2
+      action: 검색·기간·내려받기 등 기본 조작은 [목록 화면 공통 사용법]을 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+
+  faq: []
+
+---
+
+- screen_id: res-community
+  screen_name: 공동체
+  path: 입주자관리 > 공동체
+  pattern: A
+  inherits: pattern-a
+  permission: 입주자관리 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: null                   # 확인필요: 이 화면이 무엇을 하는 화면인지
+
+  steps:
+    - no: 1
+      action: 상단 [입주자관리]를 클릭한 뒤 왼쪽 목록에서 [공동체]를 클릭합니다.
+      target: nav:입주자관리 > side:공동체
+      image: res-community-01.png
+      note: null
+    - no: 2
+      action: 검색·기간·내려받기 등 기본 조작은 [목록 화면 공통 사용법]을 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+
+  faq: []
+

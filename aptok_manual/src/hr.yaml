@@ -1,0 +1,194 @@
+# 아파트ok 사용자 매뉴얼 원본 — 인사관리
+# 화면 7개. draft: true 인 항목은 화면 확인 전 뼈대이며,
+# 캡처를 본 뒤 purpose·steps·cautions·faq 를 채운다.
+
+- screen_id: hr-staff
+  screen_name: 직원현황
+  path: 인사관리 > 직원현황
+  pattern: A
+  inherits: pattern-a
+  permission: 인사관리 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: 직원을 등록하고 직책과 권한 방식을 지정한다
+
+  steps:
+    - no: 1
+      action: 상단 [인사관리]를 클릭한 뒤 왼쪽 목록에서 [직원현황]를 클릭합니다.
+      target: nav:인사관리 > side:직원현황
+      image: hr-staff-01.png
+      note: null
+    - no: 2
+      action: 검색·기간·내려받기 등 기본 조작은 [목록 화면 공통 사용법]을 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    - "개인정보가 표시되는 화면입니다. 열람 권한을 꼭 필요한 직원에게만 주세요."
+
+  faq: []
+
+  privacy_note: 캡처 시 이름·동호수·연락처를 가린다.
+
+---
+
+- screen_id: hr-rank
+  screen_name: 직급부서
+  path: 인사관리 > 직급부서
+  pattern: E
+  permission: 인사관리 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: 단지에서 쓰는 직급과 부서를 정한다
+
+  steps:
+    - no: 1
+      action: 상단 [인사관리]를 클릭한 뒤 왼쪽 목록에서 [직급부서]를 클릭합니다.
+      target: nav:인사관리 > side:직급부서
+      image: hr-rank-01.png
+      note: null
+
+  cautions:
+    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+
+  faq: []
+
+---
+
+- screen_id: hr-duty
+  screen_name: 업무분장
+  path: 인사관리 > 업무분장
+  pattern: E
+  permission: 인사관리 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: null                   # 확인필요: 이 화면이 무엇을 하는 화면인지
+
+  steps:
+    - no: 1
+      action: 상단 [인사관리]를 클릭한 뒤 왼쪽 목록에서 [업무분장]를 클릭합니다.
+      target: nav:인사관리 > side:업무분장
+      image: hr-duty-01.png
+      note: null
+
+  cautions:
+    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+
+  faq: []
+
+---
+
+- screen_id: hr-leave
+  screen_name: 휴가관리
+  path: 인사관리 > 휴가관리
+  pattern: A
+  inherits: pattern-a
+  permission: 인사관리 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: 직원 휴가를 신청하고 관리한다
+
+  steps:
+    - no: 1
+      action: 상단 [인사관리]를 클릭한 뒤 왼쪽 목록에서 [휴가관리]를 클릭합니다.
+      target: nav:인사관리 > side:휴가관리
+      image: hr-leave-01.png
+      note: null
+    - no: 2
+      action: 검색·기간·내려받기 등 기본 조작은 [목록 화면 공통 사용법]을 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    - "개인정보가 표시되는 화면입니다. 열람 권한을 꼭 필요한 직원에게만 주세요."
+
+  faq: []
+
+  privacy_note: 캡처 시 이름·동호수·연락처를 가린다.
+
+---
+
+- screen_id: hr-edu-ext
+  screen_name: 외부교육
+  path: 인사관리 > 외부교육
+  pattern: A
+  inherits: pattern-a
+  permission: 인사관리 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: 직원이 받은 외부 교육 이력을 기록한다
+
+  same_as: >
+    이 화면은 [법정일정 > 관리계획 > 외부교육]와 **같은 화면**이다.
+    어느 쪽으로 들어가도 같은 자료가 나온다. 두 번 입력할 필요가 없다.
+
+  steps:
+    - no: 1
+      action: 상단 [인사관리]를 클릭한 뒤 왼쪽 목록에서 [외부교육]를 클릭합니다.
+      target: nav:인사관리 > side:외부교육
+      image: hr-edu-ext-01.png
+      note: null
+    - no: 2
+      action: 검색·기간·내려받기 등 기본 조작은 [목록 화면 공통 사용법]을 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+
+  faq: []
+
+---
+
+- screen_id: hr-edu-int
+  screen_name: 자체교육
+  path: 인사관리 > 자체교육
+  pattern: A
+  inherits: pattern-a
+  permission: 인사관리 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: 단지 자체 교육 실시 내역을 기록한다
+
+  same_as: >
+    이 화면은 [법정일정 > 관리계획 > 자체교육]와 **같은 화면**이다.
+    어느 쪽으로 들어가도 같은 자료가 나온다. 두 번 입력할 필요가 없다.
+
+  steps:
+    - no: 1
+      action: 상단 [인사관리]를 클릭한 뒤 왼쪽 목록에서 [자체교육]를 클릭합니다.
+      target: nav:인사관리 > side:자체교육
+      image: hr-edu-int-01.png
+      note: null
+    - no: 2
+      action: 검색·기간·내려받기 등 기본 조작은 [목록 화면 공통 사용법]을 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+
+  faq: []
+
+---
+
+- screen_id: hr-appointment
+  screen_name: 법정선임
+  path: 인사관리 > 법정선임
+  pattern: C
+  permission: 인사관리 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: null                   # 확인필요: 이 화면이 무엇을 하는 화면인지
+  legal_basis: null               # 확인필요: 근거 조문
+  deadline: null                  # 확인필요: 마감일
+
+  steps:
+    - no: 1
+      action: 상단 [인사관리]를 클릭한 뒤 왼쪽 목록에서 [법정선임]를 클릭합니다.
+      target: nav:인사관리 > side:법정선임
+      image: hr-appointment-01.png
+      note: null
+
+  cautions:
+    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+
+  faq: []
+

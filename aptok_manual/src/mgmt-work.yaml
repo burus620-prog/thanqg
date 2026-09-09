@@ -1,0 +1,411 @@
+# 아파트ok 사용자 매뉴얼 원본 — 관리업무
+# 화면 17개. draft: true 인 항목은 화면 확인 전 뼈대이며,
+# 캡처를 본 뒤 purpose·steps·cautions·faq 를 채운다.
+
+- screen_id: mgmt-household-work
+  screen_name: 세대업무
+  path: 민원관리 > 세대업무
+  pattern: A
+  inherits: pattern-a
+  permission: 관리업무 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: 특정 세대에서 발생한 업무를 접수하고 처리 결과를 남긴다
+
+  steps:
+    - no: 1
+      action: 상단 [민원관리]를 클릭한 뒤 왼쪽 목록에서 [세대업무]를 클릭합니다.
+      target: nav:민원관리 > side:세대업무
+      image: mgmt-household-work-01.png
+      note: null
+    - no: 2
+      action: 검색·기간·내려받기 등 기본 조작은 [목록 화면 공통 사용법]을 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+
+  faq: []
+
+---
+
+
+- screen_id: mgmt-photos
+  screen_name: 사진함
+  path: 관리업무 > 사진함
+  pattern: A
+  inherits: pattern-a
+  permission: 관리업무 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: 업무 사진을 모아 보관하고 찾아본다
+
+  steps:
+    - no: 1
+      action: 상단 [관리업무]를 클릭한 뒤 왼쪽 목록에서 [사진함]를 클릭합니다.
+      target: nav:관리업무 > side:사진함
+      image: mgmt-photos-01.png
+      note: null
+    - no: 2
+      action: 검색·기간·내려받기 등 기본 조작은 [목록 화면 공통 사용법]을 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+
+  faq: []
+
+---
+
+- screen_id: mgmt-doc-office
+  screen_name: 문서수불(관리사무소)
+  path: 관리업무 > 문서수불(관리사무소)
+  pattern: A
+  inherits: pattern-a
+  permission: 관리업무 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: 관리사무소가 주고받은 문서를 기록한다
+
+  steps:
+    - no: 1
+      action: 상단 [관리업무]를 클릭한 뒤 왼쪽 목록에서 [문서수불(관리사무소)]를 클릭합니다.
+      target: nav:관리업무 > side:문서수불(관리사무소)
+      image: mgmt-doc-office-01.png
+      note: null
+    - no: 2
+      action: 검색·기간·내려받기 등 기본 조작은 [목록 화면 공통 사용법]을 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+
+  faq: []
+
+---
+
+- screen_id: mgmt-doc-council
+  screen_name: 문서수불(입주자대표회의)
+  path: 관리업무 > 문서수불(입주자대표회의)
+  pattern: A
+  inherits: pattern-a
+  permission: 관리업무 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: 입주자대표회의가 주고받은 문서를 기록한다
+
+  steps:
+    - no: 1
+      action: 상단 [관리업무]를 클릭한 뒤 왼쪽 목록에서 [문서수불(입주자대표회의)]를 클릭합니다.
+      target: nav:관리업무 > side:문서수불(입주자대표회의)
+      image: mgmt-doc-council-01.png
+      note: null
+    - no: 2
+      action: 검색·기간·내려받기 등 기본 조작은 [목록 화면 공통 사용법]을 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+
+  faq: []
+
+---
+
+- screen_id: mgmt-doc-election
+  screen_name: 문서수불(선거관리위원회)
+  path: 관리업무 > 문서수불(선거관리위원회)
+  pattern: A
+  inherits: pattern-a
+  permission: 관리업무 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: 선거관리위원회가 주고받은 문서를 기록한다
+
+  steps:
+    - no: 1
+      action: 상단 [관리업무]를 클릭한 뒤 왼쪽 목록에서 [문서수불(선거관리위원회)]를 클릭합니다.
+      target: nav:관리업무 > side:문서수불(선거관리위원회)
+      image: mgmt-doc-election-01.png
+      note: null
+    - no: 2
+      action: 검색·기간·내려받기 등 기본 조작은 [목록 화면 공통 사용법]을 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+
+  faq: []
+
+---
+
+- screen_id: mgmt-notice
+  screen_name: 공고문
+  path: 관리업무 > 공고문
+  pattern: A
+  inherits: pattern-a
+  permission: 관리업무 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: 단지에 게시할 공고문을 작성하고 관리한다
+
+  steps:
+    - no: 1
+      action: 상단 [관리업무]를 클릭한 뒤 왼쪽 목록에서 [공고문]를 클릭합니다.
+      target: nav:관리업무 > side:공고문
+      image: mgmt-notice-01.png
+      note: null
+    - no: 2
+      action: 검색·기간·내려받기 등 기본 조작은 [목록 화면 공통 사용법]을 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+
+  faq: []
+
+---
+
+- screen_id: mgmt-materials
+  screen_name: 각종자료
+  path: 관리업무 > 각종자료
+  pattern: A
+  inherits: pattern-a
+  permission: 관리업무 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: 업무에 쓰는 자료를 보관한다
+
+  steps:
+    - no: 1
+      action: 상단 [관리업무]를 클릭한 뒤 왼쪽 목록에서 [각종자료]를 클릭합니다.
+      target: nav:관리업무 > side:각종자료
+      image: mgmt-materials-01.png
+      note: null
+    - no: 2
+      action: 검색·기간·내려받기 등 기본 조작은 [목록 화면 공통 사용법]을 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+
+  faq: []
+
+---
+
+- screen_id: mgmt-parking-vehicle
+  screen_name: 차량관리
+  path: 관리업무 > 주차관리 > 차량관리
+  pattern: A
+  inherits: pattern-a
+  permission: 관리업무 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: 단지에 등록된 차량을 관리한다
+
+  steps:
+    - no: 1
+      action: 상단 [관리업무]를 클릭한 뒤 왼쪽 목록에서 [주차관리]를 클릭하고 [차량관리]를 클릭합니다.
+      target: nav:관리업무 > side:주차관리 > side:차량관리
+      image: mgmt-parking-vehicle-01.png
+      note: null
+    - no: 2
+      action: 검색·기간·내려받기 등 기본 조작은 [목록 화면 공통 사용법]을 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+
+  faq: []
+
+---
+
+- screen_id: mgmt-parking-enforce
+  screen_name: 주차단속
+  path: 관리업무 > 주차관리 > 주차단속
+  pattern: A
+  inherits: pattern-a
+  permission: 관리업무 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: 주차 위반 단속 내역을 기록한다
+
+  steps:
+    - no: 1
+      action: 상단 [관리업무]를 클릭한 뒤 왼쪽 목록에서 [주차관리]를 클릭하고 [주차단속]를 클릭합니다.
+      target: nav:관리업무 > side:주차관리 > side:주차단속
+      image: mgmt-parking-enforce-01.png
+      note: null
+    - no: 2
+      action: 검색·기간·내려받기 등 기본 조작은 [목록 화면 공통 사용법]을 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+
+  faq: []
+
+---
+
+- screen_id: mgmt-broadcast-notice
+  screen_name: 안내방송
+  path: 관리업무 > 방송 > 안내방송
+  pattern: B
+  permission: 관리업무 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: null                   # 확인필요: 이 화면이 무엇을 하는 화면인지
+
+  steps:
+    - no: 1
+      action: 상단 [관리업무]를 클릭한 뒤 왼쪽 목록에서 [방송]를 클릭하고 [안내방송]를 클릭합니다.
+      target: nav:관리업무 > side:방송 > side:안내방송
+      image: mgmt-broadcast-notice-01.png
+      note: null
+
+  cautions:
+    - "실제로 실행되는 동작입니다. 연습 삼아 누르지 마세요."   # 확인필요: 정확한 동작 범위
+
+  faq: []
+
+---
+
+- screen_id: mgmt-broadcast-done
+  screen_name: 완료방송
+  path: 관리업무 > 방송 > 완료방송
+  pattern: B
+  permission: 관리업무 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: null                   # 확인필요: 이 화면이 무엇을 하는 화면인지
+
+  steps:
+    - no: 1
+      action: 상단 [관리업무]를 클릭한 뒤 왼쪽 목록에서 [방송]를 클릭하고 [완료방송]를 클릭합니다.
+      target: nav:관리업무 > side:방송 > side:완료방송
+      image: mgmt-broadcast-done-01.png
+      note: null
+
+  cautions:
+    - "실제로 실행되는 동작입니다. 연습 삼아 누르지 마세요."   # 확인필요: 정확한 동작 범위
+
+  faq: []
+
+---
+
+- screen_id: mgmt-board-sample
+  screen_name: 샘플 서식/양식
+  path: 관리업무 > 게시판관리 > 샘플 서식/양식
+  pattern: E
+  permission: 관리업무 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: 기본 제공되는 서식과 양식을 본다
+
+  steps:
+    - no: 1
+      action: 상단 [관리업무]를 클릭한 뒤 왼쪽 목록에서 [게시판관리]를 클릭하고 [샘플 서식/양식]를 클릭합니다.
+      target: nav:관리업무 > side:게시판관리 > side:샘플 서식/양식
+      image: mgmt-board-sample-01.png
+      note: null
+
+  cautions:
+    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+
+  faq: []
+
+---
+
+- screen_id: mgmt-board-complex
+  screen_name: 단지 서식/양식
+  path: 관리업무 > 게시판관리 > 단지 서식/양식
+  pattern: E
+  permission: 관리업무 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: 단지에서 직접 쓰는 서식과 양식을 관리한다
+
+  steps:
+    - no: 1
+      action: 상단 [관리업무]를 클릭한 뒤 왼쪽 목록에서 [게시판관리]를 클릭하고 [단지 서식/양식]를 클릭합니다.
+      target: nav:관리업무 > side:게시판관리 > side:단지 서식/양식
+      image: mgmt-board-complex-01.png
+      note: null
+
+  cautions:
+    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+
+  faq: []
+
+---
+
+- screen_id: mgmt-fee-stats
+  screen_name: 관리비 통계
+  path: 관리업무 > 관리비 > 관리비 통계
+  pattern: D
+  permission: 관리업무 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: 관리비를 항목별·기간별로 집계해 본다
+
+  steps:
+    - no: 1
+      action: 상단 [관리업무]를 클릭한 뒤 왼쪽 목록에서 [관리비]를 클릭하고 [관리비 통계]를 클릭합니다.
+      target: nav:관리업무 > side:관리비 > side:관리비 통계
+      image: mgmt-fee-stats-01.png
+      note: null
+
+  cautions:
+    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+
+  faq: []
+
+---
+
+- screen_id: mgmt-fee-household
+  screen_name: 세대 관리비
+  path: 관리업무 > 관리비 > 세대 관리비
+  pattern: D
+  permission: 관리업무 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: 세대별 관리비를 조회한다
+
+  steps:
+    - no: 1
+      action: 상단 [관리업무]를 클릭한 뒤 왼쪽 목록에서 [관리비]를 클릭하고 [세대 관리비]를 클릭합니다.
+      target: nav:관리업무 > side:관리비 > side:세대 관리비
+      image: mgmt-fee-household-01.png
+      note: null
+
+  cautions:
+    - "개인정보가 표시되는 화면입니다. 열람 권한을 꼭 필요한 직원에게만 주세요."
+
+  faq: []
+
+  privacy_note: 캡처 시 이름·동호수·연락처를 가린다.
+
+---
+
+- screen_id: mgmt-security
+  screen_name: 보안
+  path: 관리업무 > 보안
+  pattern: D
+  permission: 관리업무 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: 개인정보 관련 문서를 내려받은 계정의 기록을 조회한다
+
+  steps:
+    - no: 1
+      action: 상단 [관리업무]를 클릭한 뒤 왼쪽 목록에서 [보안]를 클릭합니다.
+      target: nav:관리업무 > side:보안
+      image: mgmt-security-01.png
+      note: null
+
+  cautions:
+    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+
+  faq: []
+

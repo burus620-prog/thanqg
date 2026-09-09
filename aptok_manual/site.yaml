@@ -1,0 +1,38 @@
+title: 아파트ok 사용자 매뉴얼
+subtitle: 공동주택관리 플랫폼 · 관리사무소 업무용
+
+# 목차에 나올 상단 메뉴 순서
+menu_order:
+  - 민원관리
+  - 관리업무
+  - 법정일정
+  - 전자결재
+  - 자산관리
+  - 입주자관리
+  - 인사관리
+  - 입찰계약
+
+# 좌측 목차에서 처음부터 펼쳐 둘 대분류.
+# 여기 없는 대분류는 접힌 채로 시작하고, 누르면 열린다.
+menu_open:
+  - 민원관리
+
+# 대분류 안에서의 화면 순서. screen_id 로 적는다.
+# 여기 적지 않은 화면은 적힌 것들 뒤에, 원본에 나온 순서대로 붙는다.
+screen_order:
+  민원관리:
+    - cs-all                    # 전체민원
+    - mgmt-common-work-list     # 공용업무 — 목록
+    - mgmt-common-work-form     # 공용업무 — 등록 / 처리
+    - mgmt-household-work       # 세대업무
+    - cs-phone                  # 통화매니저 > 전화·문자
+    - cs-call-hist              # 통화매니저 > 통화 이력
+    - cs-sms-hist               # 통화매니저 > 문자 이력
+    - cs-svc-req                # 통화매니저 > 서비스 신청·현황
+    - cs-setting                # 통화매니저 > 설정
+    - cs-msg-sent               # 메시지 관리 > 발송 내역
+    - cs-survey                 # 설문 관리
+    - cs-survey-form            # 설문 관리 > 설문 등록
+    - cs-survey-detail          # 설문 관리 > 설문 상세·결과
+    - cs-stat                   # 민원통계
+    - cs-eval                   # 민원평가현황

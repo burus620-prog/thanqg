@@ -1,0 +1,30 @@
+# 아파트ok 사용자 매뉴얼 원본 — 입찰계약
+# 화면 1개. draft: true 인 항목은 화면 확인 전 뼈대이며,
+# 캡처를 본 뒤 purpose·steps·cautions·faq 를 채운다.
+
+- screen_id: bid-contract
+  screen_name: 계약현황
+  path: 입찰계약 > 계약현황
+  pattern: A
+  inherits: pattern-a
+  permission: 입찰계약 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: 단지가 맺은 계약을 관리한다
+
+  steps:
+    - no: 1
+      action: 상단 [입찰계약]를 클릭한 뒤 왼쪽 목록에서 [계약현황]를 클릭합니다.
+      target: nav:입찰계약 > side:계약현황
+      image: bid-contract-01.png
+      note: null
+    - no: 2
+      action: 검색·기간·내려받기 등 기본 조작은 [목록 화면 공통 사용법]을 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+
+  faq: []
+

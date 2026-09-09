@@ -1,0 +1,198 @@
+# 아파트ok 사용자 매뉴얼 원본 — 법정일정
+# 화면 8개. draft: true 인 항목은 화면 확인 전 뼈대이며,
+# 캡처를 본 뒤 purpose·steps·cautions·faq 를 채운다.
+
+- screen_id: legal-monthly
+  screen_name: 월간일정
+  path: 법정일정 > 월간일정
+  pattern: D
+  permission: 법정일정 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: 그 달에 해야 할 법정 업무를 한눈에 본다
+  legal_basis: null               # 확인필요: 근거 조문
+  deadline: null                  # 확인필요: 마감일
+
+  steps:
+    - no: 1
+      action: 상단 [법정일정]를 클릭한 뒤 왼쪽 목록에서 [월간일정]를 클릭합니다.
+      target: nav:법정일정 > side:월간일정
+      image: legal-monthly-01.png
+      note: null
+
+  cautions:
+    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+
+  faq: []
+
+---
+
+- screen_id: legal-personal
+  screen_name: 개인일정
+  path: 법정일정 > 개인일정
+  pattern: A
+  inherits: pattern-a
+  permission: 법정일정 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: 담당자 본인의 일정을 관리한다
+
+  steps:
+    - no: 1
+      action: 상단 [법정일정]를 클릭한 뒤 왼쪽 목록에서 [개인일정]를 클릭합니다.
+      target: nav:법정일정 > side:개인일정
+      image: legal-personal-01.png
+      note: null
+    - no: 2
+      action: 검색·기간·내려받기 등 기본 조작은 [목록 화면 공통 사용법]을 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+
+  faq: []
+
+---
+
+- screen_id: legal-safety
+  screen_name: 안전점검
+  path: 법정일정 > 관리계획 > 안전점검
+  pattern: C
+  permission: 법정일정 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: null                   # 확인필요: 이 화면이 무엇을 하는 화면인지
+  legal_basis: null               # 확인필요: 근거 조문
+  deadline: null                  # 확인필요: 마감일
+
+  steps:
+    - no: 1
+      action: 상단 [법정일정]를 클릭한 뒤 왼쪽 목록에서 [관리계획]를 클릭하고 [안전점검]를 클릭합니다.
+      target: nav:법정일정 > side:관리계획 > side:안전점검
+      image: legal-safety-01.png
+      note: null
+
+  cautions:
+    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+
+  faq: []
+
+---
+
+- screen_id: legal-inspection
+  screen_name: 법정검사
+  path: 법정일정 > 관리계획 > 법정검사
+  pattern: C
+  permission: 법정일정 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: null                   # 확인필요: 이 화면이 무엇을 하는 화면인지
+  legal_basis: null               # 확인필요: 근거 조문
+  deadline: null                  # 확인필요: 마감일
+
+  steps:
+    - no: 1
+      action: 상단 [법정일정]를 클릭한 뒤 왼쪽 목록에서 [관리계획]를 클릭하고 [법정검사]를 클릭합니다.
+      target: nav:법정일정 > side:관리계획 > side:법정검사
+      image: legal-inspection-01.png
+      note: null
+
+  cautions:
+    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+
+  faq: []
+
+---
+
+- screen_id: legal-report
+  screen_name: 등록/신고/보고
+  path: 법정일정 > 관리계획 > 등록/신고/보고
+  pattern: C
+  permission: 법정일정 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: null                   # 확인필요: 이 화면이 무엇을 하는 화면인지
+  legal_basis: null               # 확인필요: 근거 조문
+  deadline: null                  # 확인필요: 마감일
+
+  steps:
+    - no: 1
+      action: 상단 [법정일정]를 클릭한 뒤 왼쪽 목록에서 [관리계획]를 클릭하고 [등록/신고/보고]를 클릭합니다.
+      target: nav:법정일정 > side:관리계획 > side:등록/신고/보고
+      image: legal-report-01.png
+      note: null
+
+  cautions:
+    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+
+  faq: []
+
+---
+
+- screen_id: legal-disclosure
+  screen_name: 공개/게시/청취
+  path: 법정일정 > 관리계획 > 공개/게시/청취
+  pattern: C
+  permission: 법정일정 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: null                   # 확인필요: 이 화면이 무엇을 하는 화면인지
+  legal_basis: null               # 확인필요: 근거 조문
+  deadline: null                  # 확인필요: 마감일
+
+  steps:
+    - no: 1
+      action: 상단 [법정일정]를 클릭한 뒤 왼쪽 목록에서 [관리계획]를 클릭하고 [공개/게시/청취]를 클릭합니다.
+      target: nav:법정일정 > side:관리계획 > side:공개/게시/청취
+      image: legal-disclosure-01.png
+      note: null
+
+  cautions:
+    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+
+  faq: []
+
+---
+
+- screen_id: legal-edu-ext
+  screen_name: 외부교육
+  path: 법정일정 > 관리계획 > 외부교육
+  pattern: C
+  permission: 법정일정 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: null                   # 확인필요: 이 화면이 무엇을 하는 화면인지
+  legal_basis: null               # 확인필요: 근거 조문
+  deadline: null                  # 확인필요: 마감일
+
+  steps:
+    - no: 1
+      action: 상단 [법정일정]를 클릭한 뒤 왼쪽 목록에서 [관리계획]를 클릭하고 [외부교육]를 클릭합니다.
+      target: nav:법정일정 > side:관리계획 > side:외부교육
+      image: legal-edu-ext-01.png
+      note: null
+
+  cautions:
+    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+
+  faq: []
+
+---
+
+- screen_id: legal-edu-int
+  screen_name: 자체교육
+  path: 법정일정 > 관리계획 > 자체교육
+  pattern: C
+  permission: 법정일정 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: null                   # 확인필요: 이 화면이 무엇을 하는 화면인지
+  legal_basis: null               # 확인필요: 근거 조문
+  deadline: null                  # 확인필요: 마감일
+
+  steps:
+    - no: 1
+      action: 상단 [법정일정]를 클릭한 뒤 왼쪽 목록에서 [관리계획]를 클릭하고 [자체교육]를 클릭합니다.
+      target: nav:법정일정 > side:관리계획 > side:자체교육
+      image: legal-edu-int-01.png
+      note: null
+
+  cautions:
+    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+
+  faq: []
+

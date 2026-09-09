@@ -1,0 +1,559 @@
+# 아파트ok 캡처 경로 정의
+#
+# 화면 이동은 URL이 아니라 클릭으로만 가능하므로(링크가 javascript:;),
+# 어디를 어떤 순서로 누르는지를 여기에 적는다.
+#
+# 규칙 하나: shot 과 shot 사이에는 반드시 화면을 바꾸는 동작이 있어야 한다.
+# 동작 없이 연달아 찍으면 같은 이미지가 나올 뿐이다.
+#
+# 동작
+#   top / side / tab / text : 클릭
+#   nth_row                 : 목록 n번째 행 열기
+#   wait                    : 밀리초 대기
+#   shot                    : 화면 저장
+#   expect                  : 이 글자가 화면에 보여야 촬영을 인정한다
+#
+# mask: 촬영 전에 흐리게 처리할 영역의 CSS 선택자
+
+login:
+  url: https://aptok.co.kr/login
+  env_id: APTOK_ID
+  env_pw: APTOK_PW
+  id_field: "input[type=text]"
+  pw_field: "input[type=password]"
+  submit: "로그인"
+  ready: "관리업무"
+  complex: 성공금천아파트   # 로그인 후 단지 선택 화면이 뜨면 고를 단지
+
+# 자료 가리기. 아래 적은 열만 가린다.
+mask_data: true
+mask_columns:
+  - 성명:1
+  - 이름:1
+  - 담당자:1
+  - 접수자:1
+  - 연락처:2
+  - 세대:2
+  - 동호:2
+  - 거래처:3
+mask_keep_chars: 3
+mask_id_numbers: true
+
+# 모든 화면에 공통 적용할 마스킹. 화면별 mask 로 보완한다.
+mask_global:
+  - ".userName"
+  - ".gnb-user"
+
+routes:
+
+  # 아파트ok 도 화면마다 주소가 있다. 브라우저에서 확인한 값이다.
+  # 주소를 못 구한 화면만 아래쪽에 클릭 방식으로 두었다.
+
+  - screen_id: mgmt-common-work-list
+    steps:
+      - url: https://aptok.co.kr/administration/commonWork/APAA000001
+      - wait: 2500
+      - shot: mgmt-common-work-list-01.png
+
+  - screen_id: mgmt-common-work-form
+    steps:
+      - url: https://aptok.co.kr/administration/commonWork/APAA000001
+      - wait: 2500
+      - shot: mgmt-common-work-form-01.png
+
+  - screen_id: mgmt-common-work-form-done
+    steps:
+      - url: https://aptok.co.kr/administration/commonWork/APAA000001
+      - wait: 2500
+      - shot: mgmt-common-work-form-done-01.png
+
+  - screen_id: mgmt-household-work
+    steps:
+      - url: https://aptok.co.kr/administration/unitwork/APAB000001
+      - wait: 2500
+      - shot: mgmt-household-work-01.png
+
+  - screen_id: appr-log-power
+    steps:
+      - url: https://aptok.co.kr/document/daily/APCD000101
+      - wait: 2500
+      - shot: appr-log-power-01.png
+      - text: 일지작성
+      - wait: 2500
+      - shot: appr-log-power-02.png
+
+  - screen_id: appr-log-daily
+    steps:
+      - url: https://aptok.co.kr/document/daily/APCD000601
+      - wait: 2500
+      - shot: appr-log-daily-01.png
+      - text: 일지작성
+      - wait: 2500
+      - shot: appr-log-daily-02.png
+
+  - screen_id: cs-all
+    steps:
+      - url: https://aptok.co.kr/minwon/total/APKE000001
+      - wait: 2500
+      - shot: cs-all-01.png
+      - shot: cs-all-02.png
+
+  - screen_id: cs-phone
+    steps:
+      - url: https://aptok.co.kr/callmgr/call/APKB000201
+      - wait: 2500
+      - shot: cs-phone-01.png
+
+  - screen_id: cs-call-hist
+    steps:
+      - url: https://aptok.co.kr/callmgr/call/APKB000001
+      - wait: 2500
+      - shot: cs-call-hist-01.png
+      - shot: cs-call-hist-02.png
+
+  - screen_id: cs-sms-hist
+    steps:
+      - url: https://aptok.co.kr/callmgr/msg/APKC000001
+      - wait: 2500
+      - shot: cs-sms-hist-01.png
+
+  - screen_id: cs-svc-req
+    steps:
+      - url: https://aptok.co.kr/callmgr/apply/APKA000005
+      - wait: 2500
+      - shot: cs-svc-req-01.png
+
+  - screen_id: cs-setting
+    steps:
+      - url: https://aptok.co.kr/callmgr/setting/APKH000001
+      - wait: 2500
+      - shot: cs-setting-01.png
+      - shot: cs-setting-02.png
+      - shot: cs-setting-03.png
+      - shot: cs-setting-04.png
+
+  - screen_id: cs-msg-sent
+    steps:
+      - url: https://aptok.co.kr/minwon/message/APKG000101
+      - wait: 2500
+      - shot: cs-msg-sent-01.png
+
+  - screen_id: cs-survey
+    steps:
+      - url: https://aptok.co.kr/administration/survey/APAO000001
+      - wait: 2500
+      - expect: 설문 등록
+      - shot: cs-survey-01.png
+
+  - screen_id: cs-survey-form
+    steps:
+      - url: https://aptok.co.kr/administration/survey/APAO000001
+      - wait: 2500
+      - text: 설문 등록
+      - wait: 2000
+      - expect: 문항 구성
+      - shot: cs-survey-form-01.png
+      - text: 새 질문 추가
+      - wait: 800
+      - shot: cs-survey-form-03.png
+      - text: 참고 정보 추가
+      - wait: 800
+      - shot: cs-survey-form-04.png
+
+  # cs-survey-form-02.png (익명·공개정책·발송채널 영역)은 form-01 과 같은 화면의
+  # 아래쪽이다. 스크롤 촬영이 필요하면 수동으로 잘라 쓴다.
+
+  - screen_id: cs-survey-detail
+    steps:
+      - url: https://aptok.co.kr/administration/survey/APAO000001
+      - wait: 2500
+      - nth_row: 1
+      - wait: 2500
+      - expect: 참여 현황
+      - shot: cs-survey-detail-01.png
+      - shot: cs-survey-detail-02.png
+
+  # detail-03(활용하기로 열리는 복제 등록 화면)은 실제 등록 화면과 같은 모양이라
+  # 촬영을 생략하고 form-01 을 재사용해도 된다.
+
+  - screen_id: cs-stat
+    steps:
+      - url: https://aptok.co.kr/minwon/stat/APKF000001
+      - wait: 2500
+      - shot: cs-stat-01.png
+
+  - screen_id: cs-eval
+    steps:
+      - url: https://aptok.co.kr/administration/unitwork/APAM000101
+      - wait: 2500
+      - shot: cs-eval-01.png
+
+  - screen_id: appr-draft
+    steps:
+      - url: https://aptok.co.kr/document/draft/APCA000001
+      - wait: 2500
+      - shot: appr-draft-01.png
+
+  - screen_id: appr-log-generator
+    steps:
+      - url: https://aptok.co.kr/document/daily/APCD000201
+      - wait: 2500
+      - shot: appr-log-generator-01.png
+      - text: 일지작성
+      - wait: 2500
+      - shot: appr-log-generator-02.png
+
+  - screen_id: appr-log-heating
+    steps:
+      - url: https://aptok.co.kr/document/daily/APCD000301
+      - wait: 2500
+      - shot: appr-log-heating-01.png
+      - text: 일지작성
+      - wait: 2500
+      - shot: appr-log-heating-02.png
+
+  - screen_id: appr-log-fire
+    steps:
+      - url: https://aptok.co.kr/document/daily/APCD000401
+      - wait: 2500
+      - shot: appr-log-fire-01.png
+      - text: 일지작성
+      - wait: 2500
+      - shot: appr-log-fire-02.png
+
+  - screen_id: appr-log-security
+    steps:
+      - url: https://aptok.co.kr/document/daily/APCD000501
+      - wait: 2500
+      - shot: appr-log-security-01.png
+      - text: 일지작성
+      - wait: 2500
+      - shot: appr-log-security-02.png
+
+  - screen_id: appr-cleaning
+    steps:
+      - url: https://aptok.co.kr/document/daily/APCE000201
+      - wait: 2500
+      - shot: appr-cleaning-01.png
+      - text: 일지작성
+      - wait: 2500
+      - shot: appr-cleaning-02.png
+
+  - screen_id: mgmt-photos
+    steps:
+      - url: https://aptok.co.kr/administration/photo/APAC000001
+      - wait: 2500
+      - shot: mgmt-photos-01.png
+
+  - screen_id: mgmt-doc-office
+    steps:
+      - url: https://aptok.co.kr/administration/document/APAD000001?boardType=M
+      - wait: 2500
+      - shot: mgmt-doc-office-01.png
+
+  - screen_id: mgmt-doc-council
+    steps:
+      - url: https://aptok.co.kr/administration/document/APAD000001?boardType=R
+      - wait: 2500
+      - shot: mgmt-doc-council-01.png
+
+  - screen_id: mgmt-doc-election
+    steps:
+      - url: https://aptok.co.kr/administration/document/APAD000001?boardType=E
+      - wait: 2500
+      - shot: mgmt-doc-election-01.png
+
+  - screen_id: mgmt-notice
+    steps:
+      - url: https://aptok.co.kr/administration/comNotice/APAK000001
+      - wait: 2500
+      - shot: mgmt-notice-01.png
+
+  - screen_id: mgmt-materials
+    steps:
+      - url: https://aptok.co.kr/administration/util/APAG000001
+      - wait: 2500
+      - shot: mgmt-materials-01.png
+
+  - screen_id: mgmt-parking-vehicle
+    steps:
+      - url: https://aptok.co.kr/administration/parking/APAH000101
+      - wait: 2500
+      - shot: mgmt-parking-vehicle-01.png
+
+  - screen_id: mgmt-parking-enforce
+    steps:
+      - url: https://aptok.co.kr/administration/parking/APAH000001
+      - wait: 2500
+      - shot: mgmt-parking-enforce-01.png
+
+  - screen_id: mgmt-broadcast-notice
+    steps:
+      - url: https://aptok.co.kr/administration/broadcasting/APAJ000001
+      - wait: 2500
+      - shot: mgmt-broadcast-notice-01.png
+
+  - screen_id: mgmt-broadcast-done
+    steps:
+      - url: https://aptok.co.kr/administration/broadcasting/APAJ000101
+      - wait: 2500
+      - shot: mgmt-broadcast-done-01.png
+
+  - screen_id: mgmt-board-sample
+    steps:
+      - url: https://aptok.co.kr/administration/pattern/APAF000001
+      - wait: 2500
+      - shot: mgmt-board-sample-01.png
+
+  - screen_id: mgmt-board-complex
+    steps:
+      - url: https://aptok.co.kr/administration/pattern/APAF000101
+      - wait: 2500
+      - shot: mgmt-board-complex-01.png
+
+  - screen_id: mgmt-fee-stats
+    steps:
+      - url: https://aptok.co.kr/administration/statistics/APAL000001
+      - wait: 2500
+      - shot: mgmt-fee-stats-01.png
+
+  - screen_id: mgmt-fee-household
+    steps:
+      - url: https://aptok.co.kr/administration/statistics/APAL000101
+      - wait: 2500
+      - shot: mgmt-fee-household-01.png
+
+  - screen_id: mgmt-security
+    steps:
+      - url: https://aptok.co.kr/administration/security/APAP000001
+      - wait: 2500
+      - shot: mgmt-security-01.png
+
+  - screen_id: legal-monthly
+    steps:
+      - url: https://aptok.co.kr/yearPlan/monthly/APBC000005
+      - wait: 2500
+      - shot: legal-monthly-01.png
+
+  - screen_id: legal-personal
+    steps:
+      - url: https://aptok.co.kr/yearPlan/individual/APBD000005
+      - wait: 2500
+      - shot: legal-personal-01.png
+
+  - screen_id: legal-safety
+    steps:
+      - url: https://aptok.co.kr/yearPlan/admin/APBB000201?parentCd=SAFECHCK00
+      - wait: 2500
+      - shot: legal-safety-01.png
+
+  - screen_id: legal-inspection
+    steps:
+      - url: https://aptok.co.kr/yearPlan/admin/APBG000301?parentCd=LEGALCHK00
+      - wait: 2500
+      - shot: legal-inspection-01.png
+
+  - screen_id: legal-report
+    steps:
+      - url: https://aptok.co.kr/yearPlan/admin/APBH000401?parentCd=REPRTCHK00
+      - wait: 2500
+      - shot: legal-report-01.png
+
+  - screen_id: legal-disclosure
+    steps:
+      - url: https://aptok.co.kr/yearPlan/admin/APBR000501?parentCd=OPENCHCK00
+      - wait: 2500
+      - shot: legal-disclosure-01.png
+
+  - screen_id: legal-edu-ext
+    steps:
+      - url: https://aptok.co.kr/yearPlan/admin/APBJ000601?parentCd=LEDUCHCK00
+      - wait: 2500
+      - shot: legal-edu-ext-01.png
+
+  - screen_id: asset-stock-private
+    steps:
+      - url: https://aptok.co.kr/assets/private/APDA000001?gubun=STOCKPRIVA
+      - wait: 2500
+      - shot: asset-stock-private-01.png
+
+  - screen_id: asset-stock-common
+    steps:
+      - url: https://aptok.co.kr/assets/private/APDA000001?gubun=STOCKPUBLI
+      - wait: 2500
+      - shot: asset-stock-common-01.png
+
+  - screen_id: asset-tools
+    steps:
+      - url: https://aptok.co.kr/assets/tool/APDC000001?gubun=TOOLKIT000
+      - wait: 2500
+      - shot: asset-tools-01.png
+
+  - screen_id: asset-furniture
+    steps:
+      - url: https://aptok.co.kr/assets/tool/APDC000001?gubun=EQUIPMENT0
+      - wait: 2500
+      - shot: asset-furniture-01.png
+
+  - screen_id: res-household
+    steps:
+      - url: https://aptok.co.kr/into/unit/APEA000001
+      - wait: 2500
+      - shot: res-household-01.png
+
+  - screen_id: res-arrears
+    steps:
+      - url: https://aptok.co.kr/into/fall/APEB000001
+      - wait: 2500
+      - shot: res-arrears-01.png
+
+  - screen_id: res-council-list
+    steps:
+      - url: https://aptok.co.kr/into/delegate/APEC000001
+      - wait: 2500
+      - shot: res-council-list-01.png
+
+  - screen_id: res-council-minutes
+    steps:
+      - url: https://aptok.co.kr/into/delegate/APEC000101
+      - wait: 2500
+      - shot: res-council-minutes-01.png
+
+  - screen_id: res-community
+    steps:
+      - url: https://aptok.co.kr/into/group/APEF000001
+      - wait: 2500
+      - shot: res-community-01.png
+
+  - screen_id: hr-staff
+    steps:
+      - url: https://aptok.co.kr/hrd/employee/APFA000001
+      - wait: 2500
+      - shot: hr-staff-01.png
+
+  - screen_id: hr-rank
+    steps:
+      - url: https://aptok.co.kr/hrd/rank/APFB000005
+      - wait: 2500
+      - shot: hr-rank-01.png
+
+  - screen_id: hr-duty
+    steps:
+      - url: https://aptok.co.kr/hrd/part/APFD000001
+      - wait: 2500
+      - shot: hr-duty-01.png
+
+  - screen_id: hr-leave
+    steps:
+      - url: https://aptok.co.kr/hrd/holiday/APFE000001
+      - wait: 2500
+      - shot: hr-leave-01.png
+
+  - screen_id: hr-appointment
+    steps:
+      - url: https://aptok.co.kr/hrd/legalEdu/APFH000001
+      - wait: 2500
+      - shot: hr-appointment-01.png
+
+  - screen_id: bid-contract
+    steps:
+      - url: https://aptok.co.kr/bid/contract/APHA000001
+      - wait: 2500
+      - shot: bid-contract-01.png
+
+  - screen_id: legal-edu-int
+    steps:
+      - url: https://aptok.co.kr/yearPlan/admin/APBK000701?parentCd=IEDUCHCK00
+      - wait: 2500
+      - shot: legal-edu-int-01.png
+
+  - screen_id: appr-report
+    steps:
+      - url: https://aptok.co.kr/document/draft/APCB000001
+      - wait: 2500
+      - shot: appr-report-01.png
+
+  - screen_id: appr-order
+    steps:
+      - url: https://aptok.co.kr/document/draft/APCC000001
+      - wait: 2500
+      - shot: appr-order-01.png
+
+  - screen_id: appr-guard
+    steps:
+      - url: https://aptok.co.kr/document/daily/APCE000101
+      - wait: 2500
+      - shot: appr-guard-01.png
+      - text: 일지작성
+      - wait: 2500
+      - shot: appr-guard-02.png
+
+  - screen_id: appr-facility
+    steps:
+      - url: https://aptok.co.kr/document/daily/APCE000301
+      - wait: 2500
+      - shot: appr-facility-01.png
+      - text: 일지작성
+      - wait: 2500
+      - shot: appr-facility-02.png
+
+  - screen_id: hr-edu-ext
+    steps:
+      - url: https://aptok.co.kr/yearPlan/admin/APBJ000601?parentCd=LEDUCHCK00
+      - wait: 2500
+      - shot: hr-edu-ext-01.png
+
+  - screen_id: hr-edu-int
+    steps:
+      - url: https://aptok.co.kr/yearPlan/admin/APBK000701?parentCd=IEDUCHCK00
+      - wait: 2500
+      - shot: hr-edu-int-01.png
+
+
+  # ── 아래는 주소를 아직 못 구해 클릭으로 이동한다.
+
+  - screen_id: hr-permission-role
+    steps:
+      - top: 인사관리
+      - side: 권한관리
+      - shot: hr-permission-role-01.png
+        expect: 좌측 해당 직책/직원을 선택해 주세요
+      - text: 관리사무회계직급
+        within: 권한목록
+      - wait: 800
+      - shot: hr-permission-role-02.png
+        expect: 모든 권한
+      - text: 권한 추가
+        within: 권한목록
+      - wait: 800
+      - shot: hr-permission-role-add-01.png
+
+  - screen_id: hr-permission-individual
+    steps:
+      - top: 인사관리
+      - side: 권한관리
+      - tab: 개별 설정
+      - shot: hr-permission-individual-01.png
+        expect: 직원목록
+      - text: X
+        within: 직원목록
+      - wait: 800
+      - expect_modal: 그룹권한으로 설정되어 있습니다
+      - shot: hr-permission-individual-02.png
+      - close_modal: 확인
+
+  - screen_id: res-election-list
+    steps:
+      - top: 입주자관리
+      - side: 선거관리위원회
+      - side: 명단
+      - wait: 900
+      - shot: res-election-list-01.png
+
+  - screen_id: res-election-minutes
+    steps:
+      - top: 입주자관리
+      - side: 선거관리위원회
+      - side: 회의록
+      - wait: 900
+      - shot: res-election-minutes-01.png

@@ -1,0 +1,114 @@
+# 아파트ok 사용자 매뉴얼 원본 — 자산관리
+# 화면 4개. draft: true 인 항목은 화면 확인 전 뼈대이며,
+# 캡처를 본 뒤 purpose·steps·cautions·faq 를 채운다.
+
+- screen_id: asset-stock-private
+  screen_name: 저장품(전용)
+  path: 자산관리 > 저장품(전용)
+  pattern: A
+  inherits: pattern-a
+  permission: 자산관리 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: null                   # 확인필요: 이 화면이 무엇을 하는 화면인지
+
+  steps:
+    - no: 1
+      action: 상단 [자산관리]를 클릭한 뒤 왼쪽 목록에서 [저장품(전용)]를 클릭합니다.
+      target: nav:자산관리 > side:저장품(전용)
+      image: asset-stock-private-01.png
+      note: null
+    - no: 2
+      action: 검색·기간·내려받기 등 기본 조작은 [목록 화면 공통 사용법]을 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+
+  faq: []
+
+---
+
+- screen_id: asset-stock-common
+  screen_name: 저장품(공용)
+  path: 자산관리 > 저장품(공용)
+  pattern: A
+  inherits: pattern-a
+  permission: 자산관리 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: null                   # 확인필요: 이 화면이 무엇을 하는 화면인지
+
+  steps:
+    - no: 1
+      action: 상단 [자산관리]를 클릭한 뒤 왼쪽 목록에서 [저장품(공용)]를 클릭합니다.
+      target: nav:자산관리 > side:저장품(공용)
+      image: asset-stock-common-01.png
+      note: null
+    - no: 2
+      action: 검색·기간·내려받기 등 기본 조작은 [목록 화면 공통 사용법]을 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+
+  faq: []
+
+---
+
+- screen_id: asset-tools
+  screen_name: 공기구
+  path: 자산관리 > 공기구
+  pattern: A
+  inherits: pattern-a
+  permission: 자산관리 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: 관리사무소가 보유한 공구와 기구를 관리한다
+
+  steps:
+    - no: 1
+      action: 상단 [자산관리]를 클릭한 뒤 왼쪽 목록에서 [공기구]를 클릭합니다.
+      target: nav:자산관리 > side:공기구
+      image: asset-tools-01.png
+      note: null
+    - no: 2
+      action: 검색·기간·내려받기 등 기본 조작은 [목록 화면 공통 사용법]을 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+
+  faq: []
+
+---
+
+- screen_id: asset-furniture
+  screen_name: 집기비품
+  path: 자산관리 > 집기비품
+  pattern: A
+  inherits: pattern-a
+  permission: 자산관리 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: 사무용 집기와 비품을 관리한다
+
+  steps:
+    - no: 1
+      action: 상단 [자산관리]를 클릭한 뒤 왼쪽 목록에서 [집기비품]를 클릭합니다.
+      target: nav:자산관리 > side:집기비품
+      image: asset-furniture-01.png
+      note: null
+    - no: 2
+      action: 검색·기간·내려받기 등 기본 조작은 [목록 화면 공통 사용법]을 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+
+  faq: []
+

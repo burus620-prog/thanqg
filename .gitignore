@@ -1,0 +1,25 @@
+# Security & Secret Files
+*.pem
+*.key
+*.pfx
+*.p12
+*.crt
+*.env
+*.env.*
+secrets/
+azuer.txt
+*.log
+
+# OS & Temp Files
+.DS_Store
+Thumbs.db
+*.tmp
+
+# aptok_manual temporary & internal working files
+aptok_manual/*.zip
+aptok_manual/*.xlsx
+aptok_manual/capture (1).py
+aptok_manual/review.html
+aptok_manual/아파트ok-작업정리.md
+aptok_manual/pitfalls.md
+

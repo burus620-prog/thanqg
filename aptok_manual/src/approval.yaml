@@ -1,0 +1,460 @@
+# 아파트ok 사용자 매뉴얼 원본 — 전자결재
+# 화면 12개. draft: true 인 항목은 화면 확인 전 뼈대이며,
+# 캡처를 본 뒤 purpose·steps·cautions·faq 를 채운다.
+
+- screen_id: appr-draft
+  screen_name: 기안품의
+  path: 전자결재 > 기안품의
+  pattern: B
+  permission: 전자결재 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: null                   # 확인필요: 이 화면이 무엇을 하는 화면인지
+
+  steps:
+    - no: 1
+      action: 상단 [전자결재]를 클릭한 뒤 왼쪽 목록에서 [기안품의]를 클릭합니다.
+      target: nav:전자결재 > side:기안품의
+      image: appr-draft-01.png
+      note: null
+
+  cautions:
+    - "실제로 실행되는 동작입니다. 연습 삼아 누르지 마세요."   # 확인필요: 정확한 동작 범위
+
+  faq: []
+
+---
+
+- screen_id: appr-report
+  screen_name: 업무보고
+  path: 전자결재 > 업무보고
+  pattern: A
+  inherits: pattern-a
+  permission: 전자결재
+  purpose: 정기적으로 올리는 보고 문서를 관리한다
+
+  key_concept: >
+    기안품의가 승인을 받는 문서라면, 업무보고는 **알리는 문서**다.
+    부과명세서나 재무제표처럼 정해진 형식으로 올리는 보고가 여기 모인다.
+
+  report_types: >
+    기안유형이 나뉘어 있다.
+    업무보고 · 부과명세서 · 재무제표 · 중요업무 · 전력사용내역 · 미분류.
+    올릴 때 어느 유형인지 고르면 나중에 찾기 쉽다.
+
+  columns: [번호, 기안유형, 제목, 금액, 업체명, 작성자, 기안일시, 결재현황, 결재 후 상태, 첨부]
+
+  screen_specific:
+    - name: 기안유형 필터
+      desc: 유형별로 걸러 봅니다. 부과명세서만 모아 보는 식으로 씁니다.
+    - name: 결재현황 · 결재 후 상태
+      desc: 기안품의와 같은 방식입니다.
+    - name: 작성
+      desc: 오른쪽 위 버튼으로 새 보고를 올립니다.
+
+  steps:
+    - no: 1
+      action: 상단 [전자결재]를 클릭한 뒤 왼쪽에서 [업무보고]를 클릭합니다.
+      target: nav:전자결재 > side:업무보고
+      image: appr-report-01.png
+      note: null
+    - no: 2
+      action: 기안유형이나 기간으로 찾습니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    - "기안유형을 [미분류]로 두면 나중에 찾기 어렵습니다. 올릴 때 맞는 유형을 고르세요."
+
+  faq:
+    - q: 기안품의와 업무보고는 뭐가 다른가요?
+      a: >
+        기안품의는 승인을 받는 문서이고, 업무보고는 알리는 문서입니다.
+        부과명세서나 재무제표처럼 정기적으로 올리는 것이 업무보고입니다.
+
+---
+
+- screen_id: appr-order
+  screen_name: 지시사항
+  path: 전자결재 > 지시사항
+  pattern: A
+  inherits: pattern-a
+  permission: 전자결재 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: 지시받은 사항을 기록하고 처리 상태를 관리한다
+
+  steps:
+    - no: 1
+      action: 상단 [전자결재]를 클릭한 뒤 왼쪽 목록에서 [지시사항]를 클릭합니다.
+      target: nav:전자결재 > side:지시사항
+      image: appr-order-01.png
+      note: null
+    - no: 2
+      action: 검색·기간·내려받기 등 기본 조작은 [목록 화면 공통 사용법]을 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+
+  faq: []
+
+---
+
+- screen_id: appr-log-power
+  screen_name: 수변전일지
+  path: 전자결재 > 일일보고 > 수변전일지
+  pattern: C
+  inherits: pattern-dailylog
+  permission: 전자결재 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: 수변전 설비 운전 상황을 매일 기록한다
+
+  steps:
+    - no: 1
+      action: 상단 [전자결재]를 클릭한 뒤 왼쪽 목록에서 [일일보고]를 클릭하고 [수변전일지]를 클릭합니다.
+      target: nav:전자결재 > side:일일보고 > side:수변전일지
+      image: appr-log-power-01.png
+      note: 목록 화면입니다. 지금까지 쓴 일지가 나옵니다.
+    - no: 2
+      action: 새로 쓰려면 오른쪽 위 [일지작성]을 클릭합니다.
+      target: button:일지작성
+      image: appr-log-power-02.png
+      note: >
+        작성 화면이 열립니다. 결재선 지정과 일지 내용 입력이 한 장에 있습니다.
+        선행 설정이 빠졌으면 안내창이 먼저 뜹니다.
+    - no: 3
+      action: 이후 절차는 [일일보고 작성 공통 사용법]을 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+
+  faq: []
+
+---
+
+- screen_id: appr-log-generator
+  screen_name: 발전기 운전일지
+  path: 전자결재 > 일일보고 > 발전기 운전일지
+  pattern: C
+  inherits: pattern-dailylog
+  permission: 전자결재 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: 발전기 운전 상황을 기록한다
+
+  steps:
+    - no: 1
+      action: 상단 [전자결재]를 클릭한 뒤 왼쪽 목록에서 [일일보고]를 클릭하고 [발전기 운전일지]를 클릭합니다.
+      target: nav:전자결재 > side:일일보고 > side:발전기 운전일지
+      image: appr-log-generator-01.png
+      note: 목록 화면입니다. 지금까지 쓴 일지가 나옵니다.
+    - no: 2
+      action: 새로 쓰려면 오른쪽 위 [일지작성]을 클릭합니다.
+      target: button:일지작성
+      image: appr-log-generator-02.png
+      note: >
+        작성 화면이 열립니다. 결재선 지정과 일지 내용 입력이 한 장에 있습니다.
+        선행 설정이 빠졌으면 안내창이 먼저 뜹니다.
+    - no: 3
+      action: 이후 절차는 [일일보고 작성 공통 사용법]을 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+
+  faq: []
+
+---
+
+- screen_id: appr-log-heating
+  screen_name: 난방일지
+  path: 전자결재 > 일일보고 > 난방일지
+  pattern: C
+  inherits: pattern-dailylog
+  permission: 전자결재 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: 난방 설비 운전 상황을 기록한다
+
+  steps:
+    - no: 1
+      action: 상단 [전자결재]를 클릭한 뒤 왼쪽 목록에서 [일일보고]를 클릭하고 [난방일지]를 클릭합니다.
+      target: nav:전자결재 > side:일일보고 > side:난방일지
+      image: appr-log-heating-01.png
+      note: 목록 화면입니다. 지금까지 쓴 일지가 나옵니다.
+    - no: 2
+      action: 새로 쓰려면 오른쪽 위 [일지작성]을 클릭합니다.
+      target: button:일지작성
+      image: appr-log-heating-02.png
+      note: >
+        작성 화면이 열립니다. 결재선 지정과 일지 내용 입력이 한 장에 있습니다.
+        선행 설정이 빠졌으면 안내창이 먼저 뜹니다.
+    - no: 3
+      action: 이후 절차는 [일일보고 작성 공통 사용법]을 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+
+  faq: []
+
+---
+
+- screen_id: appr-log-fire
+  screen_name: 소방일지
+  path: 전자결재 > 일일보고 > 소방일지
+  pattern: C
+  inherits: pattern-dailylog
+  permission: 전자결재 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: 소방 설비 점검 상황을 기록한다
+
+  steps:
+    - no: 1
+      action: 상단 [전자결재]를 클릭한 뒤 왼쪽 목록에서 [일일보고]를 클릭하고 [소방일지]를 클릭합니다.
+      target: nav:전자결재 > side:일일보고 > side:소방일지
+      image: appr-log-fire-01.png
+      note: 목록 화면입니다. 지금까지 쓴 일지가 나옵니다.
+    - no: 2
+      action: 새로 쓰려면 오른쪽 위 [일지작성]을 클릭합니다.
+      target: button:일지작성
+      image: appr-log-fire-02.png
+      note: >
+        작성 화면이 열립니다. 결재선 지정과 일지 내용 입력이 한 장에 있습니다.
+        선행 설정이 빠졌으면 안내창이 먼저 뜹니다.
+    - no: 3
+      action: 이후 절차는 [일일보고 작성 공통 사용법]을 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+
+  faq: []
+
+---
+
+- screen_id: appr-log-security
+  screen_name: 경비일지
+  path: 전자결재 > 일일보고 > 경비일지
+  pattern: C
+  inherits: pattern-dailylog
+  permission: 전자결재 > 열람
+  draft: true                     # 화면 확인 전 뼈대
+  purpose: 경비 근무 상황을 기록한다
+
+  steps:
+    - no: 1
+      action: 상단 [전자결재]를 클릭한 뒤 왼쪽 목록에서 [일일보고]를 클릭하고 [경비일지]를 클릭합니다.
+      target: nav:전자결재 > side:일일보고 > side:경비일지
+      image: appr-log-security-01.png
+      note: 목록 화면입니다. 지금까지 쓴 일지가 나옵니다.
+    - no: 2
+      action: 새로 쓰려면 오른쪽 위 [일지작성]을 클릭합니다.
+      target: button:일지작성
+      image: appr-log-security-02.png
+      note: >
+        작성 화면이 열립니다. 결재선 지정과 일지 내용 입력이 한 장에 있습니다.
+        선행 설정이 빠졌으면 안내창이 먼저 뜹니다.
+    - no: 3
+      action: 이후 절차는 [일일보고 작성 공통 사용법]을 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+
+  faq: []
+
+---
+
+- screen_id: appr-log-daily
+  screen_name: 일일일지
+  path: 전자결재 > 일일보고 > 일일일지
+  pattern: C
+  inherits: pattern-dailylog
+  permission: 전자결재 > 열람
+  purpose: 그날 처리한 민원과 업무를 모아 하루치 보고로 올린다
+
+  key_concept: >
+    다른 일지가 설비 수치를 적는 것과 달리, 일일일지는 **그날의 업무를 모으는 일지**다.
+    민원 목록에서 [일일업무보고]로 넘어오면 처리한 민원이 이미 표에 들어가 있다.
+    표 아래 편집기에 특이사항을 덧붙여 마무리한다.
+
+  faster_way: >
+    이 화면을 직접 열어 처음부터 쓰는 것보다,
+    **[민원관리]에서 민원을 체크하고 [일일업무보고]를 누르는 편이 훨씬 빠르다.**
+    자세한 방법은 [민원을 일일일지로 바로 올리기] 문서를 참고한다.
+
+  screen_specific:
+    - name: 분류
+      desc: 통합업무보고 등 일지의 성격을 고릅니다.
+    - name: 공용업무 추가 / 세대민원 추가
+      desc: 표에 민원을 더 넣습니다. 민원 목록으로 되돌아가지 않아도 됩니다.
+    - name: 선택 삭제
+      desc: 표에서 뺍니다. 민원 자체는 지워지지 않습니다.
+    - name: 본문 편집기
+      desc: 표 아래에 그날의 특이사항이나 설명을 적습니다.
+    - name: 사진함 · 첨부파일
+      desc: 사진과 문서를 붙입니다. 파일 하나당 100MB 이하입니다.
+
+  steps:
+    - no: 1
+      action: 상단 [전자결재]를 클릭한 뒤 왼쪽 목록에서 [일일보고]를 클릭하고 [일일일지]를 클릭합니다.
+      target: nav:전자결재 > side:일일보고 > side:일일일지
+      image: appr-log-daily-01.png
+      note: 목록 화면입니다. 지금까지 쓴 일지가 나옵니다.
+    - no: 2
+      action: 새로 쓰려면 오른쪽 위 [일지작성]을 클릭합니다.
+      target: button:일지작성
+      image: appr-log-daily-02.png
+      note: >
+        작성 화면이 열립니다. 결재선 지정과 일지 내용 입력이 한 장에 있습니다.
+        선행 설정이 빠졌으면 안내창이 먼저 뜹니다.
+    - no: 3
+      action: 이후 절차는 [일일보고 작성 공통 사용법]을 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+
+  faq: []
+
+---
+
+- screen_id: appr-guard
+  screen_name: 경비
+  path: 전자결재 > 경비
+  pattern: C
+  inherits: pattern-dailylog
+  permission: 전자결재
+  purpose: 경비 근무 상황을 기록해 결재를 올린다
+
+  key_concept: >
+    일일보고의 일지들과 **같은 구조**다.
+    목록에서 [일지작성]을 눌러 작성 화면을 열고, 결재선을 정해 올린다.
+    자세한 방법은 [일일보고 작성 공통 사용법]을 참고한다.
+
+  columns: [번호, 제목, 작성자, 작성일시, 결재현황]
+
+  screen_specific:
+    - name: 조회 조건
+      desc: >
+        상태(진행중·반려·승인완료)와 문서 구분으로 걸러 봅니다.
+        문서 구분은 기안문서·결재대기·결재완료·감사문서·회람문서·반려문서입니다.
+    - name: 일지작성
+      desc: 오른쪽 위 버튼으로 새 일지를 씁니다.
+
+  steps:
+    - no: 1
+      action: 상단 [전자결재]를 클릭한 뒤 왼쪽에서 [경비]를 클릭합니다.
+      target: nav:전자결재 > side:경비
+      image: appr-guard-01.png
+      note: 목록 화면입니다.
+    - no: 2
+      action: 새로 쓰려면 오른쪽 위 [일지작성]을 클릭합니다.
+      target: button:일지작성
+      image: appr-guard-02.png
+      note: 이후 절차는 [일일보고 작성 공통 사용법]을 따릅니다.
+
+  cautions:
+    - "[임시저장]과 [등록]은 다릅니다. 등록해야 결재가 올라갑니다."
+
+  faq: []
+
+---
+
+- screen_id: appr-cleaning
+  screen_name: 미화
+  path: 전자결재 > 미화
+  pattern: C
+  inherits: pattern-dailylog
+  permission: 전자결재
+  purpose: 미화 작업 상황을 기록해 결재를 올린다
+
+  key_concept: >
+    일일보고의 일지들과 **같은 구조**다.
+    목록에서 [일지작성]을 눌러 작성 화면을 열고, 결재선을 정해 올린다.
+    자세한 방법은 [일일보고 작성 공통 사용법]을 참고한다.
+
+  columns: [번호, 제목, 작성자, 작성일시, 결재현황]
+
+  screen_specific:
+    - name: 조회 조건
+      desc: >
+        상태(진행중·반려·승인완료)와 문서 구분으로 걸러 봅니다.
+        문서 구분은 기안문서·결재대기·결재완료·감사문서·회람문서·반려문서입니다.
+    - name: 일지작성
+      desc: 오른쪽 위 버튼으로 새 일지를 씁니다.
+
+  steps:
+    - no: 1
+      action: 상단 [전자결재]를 클릭한 뒤 왼쪽에서 [미화]를 클릭합니다.
+      target: nav:전자결재 > side:미화
+      image: appr-cleaning-01.png
+      note: 목록 화면입니다.
+    - no: 2
+      action: 새로 쓰려면 오른쪽 위 [일지작성]을 클릭합니다.
+      target: button:일지작성
+      image: appr-cleaning-02.png
+      note: 이후 절차는 [일일보고 작성 공통 사용법]을 따릅니다.
+
+  cautions:
+    - "[임시저장]과 [등록]은 다릅니다. 등록해야 결재가 올라갑니다."
+
+  faq: []
+
+---
+
+- screen_id: appr-facility
+  screen_name: 주민공동시설
+  path: 전자결재 > 주민공동시설
+  pattern: C
+  inherits: pattern-dailylog
+  permission: 전자결재
+  purpose: 주민공동시설 운영 상황을 기록해 결재를 올린다
+
+  key_concept: >
+    일일보고의 일지들과 **같은 구조**다.
+    목록에서 [일지작성]을 눌러 작성 화면을 열고, 결재선을 정해 올린다.
+    자세한 방법은 [일일보고 작성 공통 사용법]을 참고한다.
+
+  columns: [번호, 제목, 작성자, 작성일시, 결재현황]
+
+  screen_specific:
+    - name: 조회 조건
+      desc: >
+        상태(진행중·반려·승인완료)와 문서 구분으로 걸러 봅니다.
+        문서 구분은 기안문서·결재대기·결재완료·감사문서·회람문서·반려문서입니다.
+    - name: 일지작성
+      desc: 오른쪽 위 버튼으로 새 일지를 씁니다.
+
+  steps:
+    - no: 1
+      action: 상단 [전자결재]를 클릭한 뒤 왼쪽에서 [주민공동시설]를 클릭합니다.
+      target: nav:전자결재 > side:주민공동시설
+      image: appr-facility-01.png
+      note: 목록 화면입니다.
+    - no: 2
+      action: 새로 쓰려면 오른쪽 위 [일지작성]을 클릭합니다.
+      target: button:일지작성
+      image: appr-facility-02.png
+      note: 이후 절차는 [일일보고 작성 공통 사용법]을 따릅니다.
+
+  cautions:
+    - "[임시저장]과 [등록]은 다릅니다. 등록해야 결재가 올라갑니다."
+
+  faq: []
+
+
