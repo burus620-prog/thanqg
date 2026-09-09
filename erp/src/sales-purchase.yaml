@@ -1,0 +1,317 @@
+# 성공닷컴 사용자 매뉴얼 원본 — 매출 / 매입
+# 실제 왼쪽 메뉴 구성에 맞춰 작성. 화면 12개.
+#   거래전표 관리 / 매출관리 4 / 지출결의서(출력) / 매입관리 4
+#   전자세금계산서 발행내역 / 부가세 신고 바로가기
+
+- screen_id: sp-voucher
+  screen_name: 거래전표 관리
+  path: 매출 / 매입 > 거래전표 관리
+  pattern: A
+  inherits: pattern-ledger
+  permission: 매출 / 매입
+  purpose: 매출과 매입 전표를 한곳에서 조회하고 관리한다
+  unissued_unreceived: >
+    조회 조건의 **[미발행 / 미수취]**는 매출과 매입에서 뜻이 다르다.
+    · **매출 미발행** — 매출 전표는 등록했는데 전자세금계산서를 아직 발행하지 않은 건.
+      발행해야 할 것이 남아 있다는 뜻이다.
+    · **매입 미수취** — 매입 전표는 등록했는데 그에 맞는 전자세금계산서를 아직 받지 못한 건.
+      손으로 등록한 매입 전표 중 [거래(전표) 입력]에서 수취확인을 하지 않은 것이 여기 잡힌다.
+      거래처가 세금계산서를 제대로 발행했는지 확인해야 한다는 뜻이다.
+
+  key_concept: >
+    매출과 매입 전표가 모두 모이는 화면이다.
+    위쪽에 **매출 미수·입금·총합계**와 **매입 미지급·지급·총합계**가 한 줄로 나와,
+    지금 못 받은 돈과 안 준 돈이 얼마인지 바로 보인다.
+
+  screen_specific:
+    - name: 조회 조건
+      desc: >
+        기간과 함께 [하위거래] [예상거래] [미발행 / 미수취] [차액조회]로 좁혀 볼 수 있습니다.
+        [미발행 / 미수취]는 아래 설명을 참고하세요.
+    - name: 요약 줄
+      desc: 매출(미수·입금·총합계)과 매입(미지급·지급·총합계)이 나란히 표시됩니다.
+    - name: 매출 세금계산서 발행
+      desc: 고른 전표로 세금계산서를 발행합니다.
+    - name: 거래명세서 출력
+      desc: 고른 전표로 거래명세서를 뽑습니다.
+    - name: 일괄변경
+      desc: 여러 건의 항목을 한꺼번에 바꿉니다.
+    - name: 갚기/받기
+      desc: >
+        외상으로 남은 건의 수납·지급을 처리합니다.
+        [금융(입출금)]의 수납·지급 확인과 **같은 일**을 합니다.
+        화면 구성만 다르니 편한 쪽에서 하면 됩니다.
+    - name: 복사 / 삭제
+      desc: 전표를 복사해 새로 만들거나 지웁니다.
+    - name: 항목 추가
+      desc: 표에 보일 열을 고릅니다.
+    - name: 등록
+      desc: 전표를 직접 등록합니다.
+    - name: 잔액(외상) 열
+      desc: 그 거래에서 아직 못 받았거나 안 준 금액이 나옵니다.
+
+  steps:
+    - no: 1
+      action: 상단 [매출 / 매입]을 클릭한 뒤 왼쪽에서 [거래전표 관리]을 클릭합니다.
+      target: nav:매출 / 매입 > side:거래전표 관리
+      image: sp-voucher-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: sp-sales-tax
+  screen_name: 매출(전자세금계산서)
+  path: 매출 / 매입 > 매출관리 > 매출(전자세금계산서)
+  pattern: A
+  inherits: pattern-ledger
+  permission: 매출 / 매입
+  draft: true                       # 화면 확인 전 뼈대
+  purpose: 발행한 전자세금계산서 매출을 관리한다
+
+  steps:
+    - no: 1
+      action: 상단 [매출 / 매입]을 클릭한 뒤 왼쪽 [매출관리]에서 [매출(전자세금계산서)]을 클릭합니다.
+      target: nav:매출 / 매입 > side:매출(전자세금계산서)
+      image: sp-sales-tax-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: sp-sales-card
+  screen_name: 매출(카드)
+  path: 매출 / 매입 > 매출관리 > 매출(카드)
+  pattern: A
+  inherits: pattern-ledger
+  permission: 매출 / 매입
+  draft: true                       # 화면 확인 전 뼈대
+  purpose: 카드 매출을 관리한다
+
+  steps:
+    - no: 1
+      action: 상단 [매출 / 매입]을 클릭한 뒤 왼쪽 [매출관리]에서 [매출(카드)]을 클릭합니다.
+      target: nav:매출 / 매입 > side:매출(카드)
+      image: sp-sales-card-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: sp-sales-cash
+  screen_name: 매출(현금영수증)
+  path: 매출 / 매입 > 매출관리 > 매출(현금영수증)
+  pattern: A
+  inherits: pattern-ledger
+  permission: 매출 / 매입
+  draft: true                       # 화면 확인 전 뼈대
+  purpose: 현금영수증 매출을 관리한다
+
+  steps:
+    - no: 1
+      action: 상단 [매출 / 매입]을 클릭한 뒤 왼쪽 [매출관리]에서 [매출(현금영수증)]을 클릭합니다.
+      target: nav:매출 / 매입 > side:매출(현금영수증)
+      image: sp-sales-cash-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: sp-sales-etc
+  screen_name: 매출(기타영수증)
+  path: 매출 / 매입 > 매출관리 > 매출(기타영수증)
+  pattern: A
+  inherits: pattern-ledger
+  permission: 매출 / 매입
+  draft: true                       # 화면 확인 전 뼈대
+  purpose: 위 셋에 해당하지 않는 매출을 직접 기록한다
+
+  steps:
+    - no: 1
+      action: 상단 [매출 / 매입]을 클릭한 뒤 왼쪽 [매출관리]에서 [매출(기타영수증)]을 클릭합니다.
+      target: nav:매출 / 매입 > side:매출(기타영수증)
+      image: sp-sales-etc-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: sp-expense-report
+  screen_name: 지출결의서(출력)
+  path: 매출 / 매입 > 지출결의서(출력)
+  pattern: D
+  inherits: pattern-ledger
+  permission: 매출 / 매입
+  draft: true                       # 화면 확인 전 뼈대
+  purpose: 지출 내역을 결의서 서식으로 뽑는다
+
+  steps:
+    - no: 1
+      action: 상단 [매출 / 매입]을 클릭한 뒤 왼쪽에서 [지출결의서(출력)]을 클릭합니다.
+      target: nav:매출 / 매입 > side:지출결의서(출력)
+      image: sp-expense-report-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: sp-purchase-tax
+  screen_name: 매입(전자세금계산서)
+  path: 매출 / 매입 > 매입관리 > 매입(전자세금계산서)
+  pattern: A
+  inherits: pattern-ledger
+  permission: 매출 / 매입
+  draft: true                       # 화면 확인 전 뼈대
+  purpose: 받은 전자세금계산서 매입을 관리한다
+
+  steps:
+    - no: 1
+      action: 상단 [매출 / 매입]을 클릭한 뒤 왼쪽 [매입관리]에서 [매입(전자세금계산서)]을 클릭합니다.
+      target: nav:매출 / 매입 > side:매입(전자세금계산서)
+      image: sp-purchase-tax-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: sp-purchase-card
+  screen_name: 매입(카드)
+  path: 매출 / 매입 > 매입관리 > 매입(카드)
+  pattern: A
+  inherits: pattern-ledger
+  permission: 매출 / 매입
+  draft: true                       # 화면 확인 전 뼈대
+  purpose: 카드로 쓴 지출을 관리한다
+
+  steps:
+    - no: 1
+      action: 상단 [매출 / 매입]을 클릭한 뒤 왼쪽 [매입관리]에서 [매입(카드)]을 클릭합니다.
+      target: nav:매출 / 매입 > side:매입(카드)
+      image: sp-purchase-card-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: sp-purchase-cash
+  screen_name: 매입(현금영수증)
+  path: 매출 / 매입 > 매입관리 > 매입(현금영수증)
+  pattern: A
+  inherits: pattern-ledger
+  permission: 매출 / 매입
+  draft: true                       # 화면 확인 전 뼈대
+  purpose: 현금영수증 매입을 관리한다
+
+  steps:
+    - no: 1
+      action: 상단 [매출 / 매입]을 클릭한 뒤 왼쪽 [매입관리]에서 [매입(현금영수증)]을 클릭합니다.
+      target: nav:매출 / 매입 > side:매입(현금영수증)
+      image: sp-purchase-cash-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: sp-purchase-etc
+  screen_name: 매입(기타영수증)
+  path: 매출 / 매입 > 매입관리 > 매입(기타영수증)
+  pattern: A
+  inherits: pattern-ledger
+  permission: 매출 / 매입
+  draft: true                       # 화면 확인 전 뼈대
+  purpose: 위 셋에 해당하지 않는 지출을 직접 기록한다
+
+  steps:
+    - no: 1
+      action: 상단 [매출 / 매입]을 클릭한 뒤 왼쪽 [매입관리]에서 [매입(기타영수증)]을 클릭합니다.
+      target: nav:매출 / 매입 > side:매입(기타영수증)
+      image: sp-purchase-etc-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: sp-tax-issued
+  screen_name: 전자세금계산서 발행내역
+  path: 매출 / 매입 > 전자세금계산서 발행내역
+  pattern: D
+  inherits: pattern-ledger
+  permission: 매출 / 매입
+  draft: true                       # 화면 확인 전 뼈대
+  purpose: 내가 발행한 전자세금계산서의 처리 상태를 조회한다
+
+  steps:
+    - no: 1
+      action: 상단 [매출 / 매입]을 클릭한 뒤 왼쪽에서 [전자세금계산서 발행내역]을 클릭합니다.
+      target: nav:매출 / 매입 > side:전자세금계산서 발행내역
+      image: sp-tax-issued-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: sp-vat-link
+  screen_name: 부가세 신고 바로가기
+  path: 매출 / 매입 > 부가세 신고 바로가기
+  pattern: D
+  inherits: pattern-ledger
+  permission: 매출 / 매입
+  draft: true                       # 화면 확인 전 뼈대
+  purpose: 부가세 신고 화면으로 바로 넘어간다
+
+  steps:
+    - no: 1
+      action: 상단 [매출 / 매입]을 클릭한 뒤 왼쪽에서 [부가세 신고 바로가기]을 클릭합니다.
+      target: nav:매출 / 매입 > side:부가세 신고 바로가기
+      image: sp-vat-link-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+

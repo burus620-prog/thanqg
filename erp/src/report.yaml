@@ -1,0 +1,438 @@
+# 성공닷컴 사용자 매뉴얼 원본 — 보고서
+# 실제 왼쪽 메뉴 구성에 맞춰 작성. 화면 18개.
+#   금융보고서 / 세무요약 보고서 / 매출매입 보고서 2 / 채권채무 보고서
+#   월간경영 보고서 4 / 경영보고서 5 / 경영 관리 4
+
+- screen_id: rpt-financial
+  screen_name: 금융보고서
+  path: 보고서 > 금융보고서
+  pattern: D
+  inherits: pattern-report
+  permission: 보고서
+  purpose: 통장·카드·여신을 아우른 자금 흐름을 하루 단위로 본다
+  key_concept: >
+    하루 기준으로 자금이 어떻게 움직였는지 보여주는 **자금일보**다.
+    통장별 잔액, 카드 지출별 이용대금, 여신금융협회 매출, 현금영수증까지 한 화면에 모인다.
+    오늘 쓸 수 있는 돈이 얼마인지 확인할 때 쓴다.
+
+  screen_specific:
+    - name: 자동수집 / 장부 탭
+      desc: >
+        자동수집으로 가져온 자료로 볼지, 장부에 들어간 자료로 볼지 고릅니다.
+        두 숫자가 다르면 장부에 아직 안 넣은 자료가 있다는 뜻입니다.
+    - name: 날짜 이동
+      desc: 화살표로 하루씩 앞뒤로 옮겨 봅니다.
+    - name: 통장별 구분
+      desc: >
+        전일 잔액 → 당일 입금 소계 → 총액 → 출금 소계 → 당일 잔액 순으로
+        통장마다 나뉘어 나옵니다.
+    - name: 카드 지출별 구분
+      desc: 전월 이용대금, 지출 소계, 당월 이용대금(예정)이 카드별로 나옵니다.
+    - name: 여신금융협회 (매출)
+      desc: D-2부터 D+2까지 카드 매출 정산 예정이 날짜별로 나옵니다.
+    - name: 현금영수증 (지출 / 매출)
+      desc: 현금영수증 내역이 지출과 매출로 나뉘어 나옵니다.
+
+  steps:
+    - no: 1
+      action: 상단 [보고서]를 클릭한 뒤 왼쪽에서 [금융보고서]를 클릭합니다.
+      target: nav:보고서 > side:금융보고서
+      image: rpt-financial-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: rpt-tax-summary
+  screen_name: 세무요약 보고서
+  path: 보고서 > 세무요약 보고서
+  pattern: D
+  inherits: pattern-report
+  permission: 보고서
+  draft: true                       # 화면 확인 전 뼈대
+  purpose: 신고에 쓰이는 숫자를 요약해 본다
+
+  steps:
+    - no: 1
+      action: 상단 [보고서]를 클릭한 뒤 왼쪽에서 [세무요약 보고서]를 클릭합니다.
+      target: nav:보고서 > side:세무요약 보고서
+      image: rpt-tax-summary-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: rpt-sp-summary
+  screen_name: 월간 / 연간 요약
+  path: 보고서 > 매출매입 보고서 > 월간 / 연간 요약
+  pattern: D
+  inherits: pattern-report
+  permission: 보고서
+  draft: true                       # 화면 확인 전 뼈대
+  purpose: 매출과 매입을 월별·연간으로 집계해 본다
+
+  steps:
+    - no: 1
+      action: 상단 [보고서]를 클릭한 뒤 왼쪽 [매출매입 보고서]에서 [월간 / 연간 요약]를 클릭합니다.
+      target: nav:보고서 > side:월간 / 연간 요약
+      image: rpt-sp-summary-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: rpt-sp-manage
+  screen_name: 매출 매입 관리
+  path: 보고서 > 매출매입 보고서 > 매출 매입 관리
+  pattern: D
+  inherits: pattern-report
+  permission: 보고서
+  draft: true                       # 화면 확인 전 뼈대
+  purpose: 매출·매입 내역을 관리 관점에서 본다
+
+  steps:
+    - no: 1
+      action: 상단 [보고서]를 클릭한 뒤 왼쪽 [매출매입 보고서]에서 [매출 매입 관리]를 클릭합니다.
+      target: nav:보고서 > side:매출 매입 관리
+      image: rpt-sp-manage-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: rpt-receivable-payable
+  screen_name: 채권채무 보고서
+  path: 보고서 > 채권채무 보고서
+  pattern: D
+  inherits: pattern-report
+  permission: 보고서
+  draft: true                       # 화면 확인 전 뼈대
+  purpose: 아직 못 받은 돈과 안 준 돈을 거래처별로 본다
+
+  steps:
+    - no: 1
+      action: 상단 [보고서]를 클릭한 뒤 왼쪽에서 [채권채무 보고서]를 클릭합니다.
+      target: nav:보고서 > side:채권채무 보고서
+      image: rpt-receivable-payable-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: rpt-m-performance
+  screen_name: 월간 경영 실적현황
+  path: 보고서 > 월간경영 보고서 > 월간 경영 실적현황
+  pattern: D
+  inherits: pattern-report
+  permission: 보고서
+  draft: true                       # 화면 확인 전 뼈대
+  purpose: 한 달의 경영 실적을 본다
+
+  steps:
+    - no: 1
+      action: 상단 [보고서]를 클릭한 뒤 왼쪽 [월간경영 보고서]에서 [월간 경영 실적현황]를 클릭합니다.
+      target: nav:보고서 > side:월간 경영 실적현황
+      image: rpt-m-performance-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: rpt-m-position
+  screen_name: 월간 재무상태현황
+  path: 보고서 > 월간경영 보고서 > 월간 재무상태현황
+  pattern: D
+  inherits: pattern-report
+  permission: 보고서
+  draft: true                       # 화면 확인 전 뼈대
+  purpose: 한 달 기준 재무상태를 본다
+
+  steps:
+    - no: 1
+      action: 상단 [보고서]를 클릭한 뒤 왼쪽 [월간경영 보고서]에서 [월간 재무상태현황]를 클릭합니다.
+      target: nav:보고서 > side:월간 재무상태현황
+      image: rpt-m-position-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: rpt-m-stat
+  screen_name: 경영 통계
+  path: 보고서 > 월간경영 보고서 > 경영 통계
+  pattern: D
+  inherits: pattern-report
+  permission: 보고서
+  draft: true                       # 화면 확인 전 뼈대
+  purpose: 경영 지표를 통계로 본다
+
+  steps:
+    - no: 1
+      action: 상단 [보고서]를 클릭한 뒤 왼쪽 [월간경영 보고서]에서 [경영 통계]를 클릭합니다.
+      target: nav:보고서 > side:경영 통계
+      image: rpt-m-stat-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: rpt-m-fstat
+  screen_name: 재무 통계
+  path: 보고서 > 월간경영 보고서 > 재무 통계
+  pattern: D
+  inherits: pattern-report
+  permission: 보고서
+  draft: true                       # 화면 확인 전 뼈대
+  purpose: 재무 지표를 통계로 본다
+
+  steps:
+    - no: 1
+      action: 상단 [보고서]를 클릭한 뒤 왼쪽 [월간경영 보고서]에서 [재무 통계]를 클릭합니다.
+      target: nav:보고서 > side:재무 통계
+      image: rpt-m-fstat-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: rpt-b-compare
+  screen_name: 경영비교
+  path: 보고서 > 경영보고서 > 경영비교
+  pattern: D
+  inherits: pattern-report
+  permission: 보고서
+  draft: true                       # 화면 확인 전 뼈대
+  purpose: 손익계산서를 전년도·전월과 나란히 비교한다
+
+  steps:
+    - no: 1
+      action: 상단 [보고서]를 클릭한 뒤 왼쪽 [경영보고서]에서 [경영비교]를 클릭합니다.
+      target: nav:보고서 > side:경영비교
+      image: rpt-b-compare-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: rpt-b-fund
+  screen_name: 자금
+  path: 보고서 > 경영보고서 > 자금
+  pattern: D
+  inherits: pattern-report
+  permission: 보고서
+  draft: true                       # 화면 확인 전 뼈대
+  purpose: 통장 현황, 외상 매출·매입, 카드 미수·미지급을 한눈에 본다
+
+  steps:
+    - no: 1
+      action: 상단 [보고서]를 클릭한 뒤 왼쪽 [경영보고서]에서 [자금]를 클릭합니다.
+      target: nav:보고서 > side:자금
+      image: rpt-b-fund-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: rpt-b-expense
+  screen_name: 비용(지출)
+  path: 보고서 > 경영보고서 > 비용(지출)
+  pattern: D
+  inherits: pattern-report
+  permission: 보고서
+  draft: true                       # 화면 확인 전 뼈대
+  purpose: 거래명(계정과목)별로 매월 얼마나 지출되는지 본다
+
+  steps:
+    - no: 1
+      action: 상단 [보고서]를 클릭한 뒤 왼쪽 [경영보고서]에서 [비용(지출)]를 클릭합니다.
+      target: nav:보고서 > side:비용(지출)
+      image: rpt-b-expense-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: rpt-b-payroll
+  screen_name: 급여
+  path: 보고서 > 경영보고서 > 급여
+  pattern: D
+  inherits: pattern-report
+  permission: 보고서
+  draft: true                       # 화면 확인 전 뼈대
+  purpose: 인건비 현황을 월별·연간으로, 지급·미지급과 함께 본다
+
+  steps:
+    - no: 1
+      action: 상단 [보고서]를 클릭한 뒤 왼쪽 [경영보고서]에서 [급여]를 클릭합니다.
+      target: nav:보고서 > side:급여
+      image: rpt-b-payroll-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: rpt-b-limit
+  screen_name: 한도관리
+  path: 보고서 > 경영보고서 > 한도관리
+  pattern: D
+  inherits: pattern-report
+  permission: 보고서
+  draft: true                       # 화면 확인 전 뼈대
+  purpose: 신용카드 한도 등 자금 운영에 참고할 정보를 본다
+
+  steps:
+    - no: 1
+      action: 상단 [보고서]를 클릭한 뒤 왼쪽 [경영보고서]에서 [한도관리]를 클릭합니다.
+      target: nav:보고서 > side:한도관리
+      image: rpt-b-limit-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: rpt-m-ledger
+  screen_name: 관항목(거래명) 원장
+  path: 보고서 > 경영 관리 > 관항목(거래명) 원장
+  pattern: D
+  inherits: pattern-report
+  permission: 보고서
+  draft: true                       # 화면 확인 전 뼈대
+  purpose: 거래명별로 거래 내역을 원장 형태로 본다
+
+  steps:
+    - no: 1
+      action: 상단 [보고서]를 클릭한 뒤 왼쪽 [경영 관리]에서 [관항목(거래명) 원장]를 클릭합니다.
+      target: nav:보고서 > side:관항목(거래명) 원장
+      image: rpt-m-ledger-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: rpt-m-pl
+  screen_name: 수익 비용 비교
+  path: 보고서 > 경영 관리 > 수익 비용 비교
+  pattern: D
+  inherits: pattern-report
+  permission: 보고서
+  draft: true                       # 화면 확인 전 뼈대
+  purpose: 수익과 비용을 견주어 본다
+
+  steps:
+    - no: 1
+      action: 상단 [보고서]를 클릭한 뒤 왼쪽 [경영 관리]에서 [수익 비용 비교]를 클릭합니다.
+      target: nav:보고서 > side:수익 비용 비교
+      image: rpt-m-pl-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: rpt-m-total
+  screen_name: 총계정원장
+  path: 보고서 > 경영 관리 > 총계정원장
+  pattern: D
+  inherits: pattern-report
+  permission: 보고서
+  draft: true                       # 화면 확인 전 뼈대
+  purpose: 계정과목별 전체 거래를 원장으로 본다
+
+  steps:
+    - no: 1
+      action: 상단 [보고서]를 클릭한 뒤 왼쪽 [경영 관리]에서 [총계정원장]를 클릭합니다.
+      target: nav:보고서 > side:총계정원장
+      image: rpt-m-total-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: rpt-m-journal
+  screen_name: 분개장
+  path: 보고서 > 경영 관리 > 분개장
+  pattern: D
+  inherits: pattern-report
+  permission: 보고서
+  draft: true                       # 화면 확인 전 뼈대
+  purpose: 모든 거래를 분개 순서대로 본다
+
+  steps:
+    - no: 1
+      action: 상단 [보고서]를 클릭한 뒤 왼쪽 [경영 관리]에서 [분개장]를 클릭합니다.
+      target: nav:보고서 > side:분개장
+      image: rpt-m-journal-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+

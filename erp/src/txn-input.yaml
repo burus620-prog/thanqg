@@ -1,0 +1,339 @@
+# 성공닷컴 사용자 매뉴얼 원본 — 거래(전표) 입력
+# 왼쪽 메뉴가 세 묶음으로 나뉜다.
+#   매출 거래 자동수집 입력 3 / 매입 거래 자동수집 입력 3 / 엑셀(전표) 입력 6
+# 매출과 매입의 항목 이름이 같으므로(전자세금계산서·카드·현금영수증) 묶음으로 구분한다.
+
+- screen_id: txn-auto-sales-tax
+  screen_name: 전자세금계산서
+  path: 거래(전표) 입력 > 매출 거래 자동수집 입력 > 전자세금계산서
+  pattern: pattern-auto
+  inherits: pattern-auto
+  permission: 거래(전표) 입력
+  draft: true                       # 화면 확인 중
+  purpose: 국세청 홈택스에서 매출 전자세금계산서를 가져온다
+
+  steps:
+    - no: 1
+      action: 상단 [거래(전표) 입력]을 클릭한 뒤 왼쪽 [매출 거래 자동수집 입력]에서 [전자세금계산서]을 클릭합니다.
+      target: nav:거래(전표) 입력 > side:매출 거래 자동수집 입력 > 전자세금계산서
+      image: txn-auto-sales-tax-01.png
+      note: 왼쪽 메뉴 이름 옆 숫자는 아직 처리하지 않은 건수입니다.
+    - no: 2
+      action: 이후 절차는 공통 문서를 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: txn-auto-sales-card
+  screen_name: 카드
+  path: 거래(전표) 입력 > 매출 거래 자동수집 입력 > 카드
+  pattern: pattern-auto
+  inherits: pattern-auto
+  permission: 거래(전표) 입력
+  draft: true                       # 화면 확인 중
+  purpose: 카드사에서 매출 자료를 가져온다
+
+  steps:
+    - no: 1
+      action: 상단 [거래(전표) 입력]을 클릭한 뒤 왼쪽 [매출 거래 자동수집 입력]에서 [카드]을 클릭합니다.
+      target: nav:거래(전표) 입력 > side:매출 거래 자동수집 입력 > 카드
+      image: txn-auto-sales-card-01.png
+      note: 왼쪽 메뉴 이름 옆 숫자는 아직 처리하지 않은 건수입니다.
+    - no: 2
+      action: 이후 절차는 공통 문서를 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: txn-auto-sales-cash
+  screen_name: 현금영수증
+  path: 거래(전표) 입력 > 매출 거래 자동수집 입력 > 현금영수증
+  pattern: pattern-auto
+  inherits: pattern-auto
+  permission: 거래(전표) 입력
+  draft: true                       # 화면 확인 중
+  purpose: 발행한 현금영수증 매출을 가져온다
+
+  steps:
+    - no: 1
+      action: 상단 [거래(전표) 입력]을 클릭한 뒤 왼쪽 [매출 거래 자동수집 입력]에서 [현금영수증]을 클릭합니다.
+      target: nav:거래(전표) 입력 > side:매출 거래 자동수집 입력 > 현금영수증
+      image: txn-auto-sales-cash-01.png
+      note: 왼쪽 메뉴 이름 옆 숫자는 아직 처리하지 않은 건수입니다.
+    - no: 2
+      action: 이후 절차는 공통 문서를 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: txn-auto-purchase-tax
+  screen_name: 전자세금계산서
+  path: 거래(전표) 입력 > 매입 거래 자동수집 입력 > 전자세금계산서
+  pattern: pattern-auto
+  inherits: pattern-auto
+  permission: 거래(전표) 입력
+  draft: true                       # 화면 확인 중
+  purpose: 국세청 홈택스에서 매입 전자세금계산서를 가져온다
+
+  steps:
+    - no: 1
+      action: 상단 [거래(전표) 입력]을 클릭한 뒤 왼쪽 [매입 거래 자동수집 입력]에서 [전자세금계산서]을 클릭합니다.
+      target: nav:거래(전표) 입력 > side:매입 거래 자동수집 입력 > 전자세금계산서
+      image: txn-auto-purchase-tax-01.png
+      note: 왼쪽 메뉴 이름 옆 숫자는 아직 처리하지 않은 건수입니다.
+    - no: 2
+      action: 이후 절차는 공통 문서를 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: txn-auto-purchase-card
+  screen_name: 카드
+  path: 거래(전표) 입력 > 매입 거래 자동수집 입력 > 카드
+  pattern: pattern-auto
+  inherits: pattern-auto
+  permission: 거래(전표) 입력
+  draft: true                       # 화면 확인 중
+  purpose: 사업용 카드로 쓴 지출 자료를 가져온다
+
+  steps:
+    - no: 1
+      action: 상단 [거래(전표) 입력]을 클릭한 뒤 왼쪽 [매입 거래 자동수집 입력]에서 [카드]을 클릭합니다.
+      target: nav:거래(전표) 입력 > side:매입 거래 자동수집 입력 > 카드
+      image: txn-auto-purchase-card-01.png
+      note: 왼쪽 메뉴 이름 옆 숫자는 아직 처리하지 않은 건수입니다.
+    - no: 2
+      action: 이후 절차는 공통 문서를 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: txn-auto-purchase-cash
+  screen_name: 현금영수증
+  path: 거래(전표) 입력 > 매입 거래 자동수집 입력 > 현금영수증
+  pattern: pattern-auto
+  inherits: pattern-auto
+  permission: 거래(전표) 입력
+  draft: true                       # 화면 확인 중
+  purpose: 지출 증빙으로 받은 현금영수증을 가져온다
+
+  steps:
+    - no: 1
+      action: 상단 [거래(전표) 입력]을 클릭한 뒤 왼쪽 [매입 거래 자동수집 입력]에서 [현금영수증]을 클릭합니다.
+      target: nav:거래(전표) 입력 > side:매입 거래 자동수집 입력 > 현금영수증
+      image: txn-auto-purchase-cash-01.png
+      note: 왼쪽 메뉴 이름 옆 숫자는 아직 처리하지 않은 건수입니다.
+    - no: 2
+      action: 이후 절차는 공통 문서를 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: txn-excel-tax
+  screen_name: 전자(세금)계산서
+  path: 거래(전표) 입력 > 엑셀(전표) 입력 > 전자(세금)계산서
+  pattern: pattern-excel
+  inherits: pattern-excel
+  permission: 거래(전표) 입력
+  draft: true                       # 화면 확인 중
+  purpose: 전자(세금)계산서 내역을 엑셀로 한꺼번에 올린다
+
+  steps:
+    - no: 1
+      action: 상단 [거래(전표) 입력]을 클릭한 뒤 왼쪽 [엑셀(전표) 입력]에서 [전자(세금)계산서]을 클릭합니다.
+      target: nav:거래(전표) 입력 > side:엑셀(전표) 입력 > 전자(세금)계산서
+      image: txn-excel-tax-01.png
+      note: 왼쪽 메뉴 이름 옆 숫자는 아직 처리하지 않은 건수입니다.
+    - no: 2
+      action: 이후 절차는 공통 문서를 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: txn-excel-card-expense
+  screen_name: 카드지출
+  path: 거래(전표) 입력 > 엑셀(전표) 입력 > 카드지출
+  pattern: pattern-excel
+  inherits: pattern-excel
+  permission: 거래(전표) 입력
+  draft: true                       # 화면 확인 중
+  purpose: 카드 지출 내역을 엑셀로 한꺼번에 올린다
+
+  steps:
+    - no: 1
+      action: 상단 [거래(전표) 입력]을 클릭한 뒤 왼쪽 [엑셀(전표) 입력]에서 [카드지출]을 클릭합니다.
+      target: nav:거래(전표) 입력 > side:엑셀(전표) 입력 > 카드지출
+      image: txn-excel-card-expense-01.png
+      note: 왼쪽 메뉴 이름 옆 숫자는 아직 처리하지 않은 건수입니다.
+    - no: 2
+      action: 이후 절차는 공통 문서를 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: txn-excel-card-sales
+  screen_name: 카드 매출
+  path: 거래(전표) 입력 > 엑셀(전표) 입력 > 카드 매출
+  pattern: pattern-excel
+  inherits: pattern-excel
+  permission: 거래(전표) 입력
+  draft: true                       # 화면 확인 중
+  purpose: 카드 매출 내역을 엑셀로 한꺼번에 올린다
+
+  steps:
+    - no: 1
+      action: 상단 [거래(전표) 입력]을 클릭한 뒤 왼쪽 [엑셀(전표) 입력]에서 [카드 매출]을 클릭합니다.
+      target: nav:거래(전표) 입력 > side:엑셀(전표) 입력 > 카드 매출
+      image: txn-excel-card-sales-01.png
+      note: 왼쪽 메뉴 이름 옆 숫자는 아직 처리하지 않은 건수입니다.
+    - no: 2
+      action: 이후 절차는 공통 문서를 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: txn-excel-sales-cash
+  screen_name: 매출(현금영수증)
+  path: 거래(전표) 입력 > 엑셀(전표) 입력 > 매출(현금영수증)
+  pattern: pattern-excel
+  inherits: pattern-excel
+  permission: 거래(전표) 입력
+  draft: true                       # 화면 확인 중
+  purpose: 현금영수증 매출 내역을 엑셀로 한꺼번에 올린다
+
+  steps:
+    - no: 1
+      action: 상단 [거래(전표) 입력]을 클릭한 뒤 왼쪽 [엑셀(전표) 입력]에서 [매출(현금영수증)]을 클릭합니다.
+      target: nav:거래(전표) 입력 > side:엑셀(전표) 입력 > 매출(현금영수증)
+      image: txn-excel-sales-cash-01.png
+      note: 왼쪽 메뉴 이름 옆 숫자는 아직 처리하지 않은 건수입니다.
+    - no: 2
+      action: 이후 절차는 공통 문서를 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: txn-excel-purchase-cash
+  screen_name: 매입(현금영수증)
+  path: 거래(전표) 입력 > 엑셀(전표) 입력 > 매입(현금영수증)
+  pattern: pattern-excel
+  inherits: pattern-excel
+  permission: 거래(전표) 입력
+  draft: true                       # 화면 확인 중
+  purpose: 현금영수증 매입 내역을 엑셀로 한꺼번에 올린다
+
+  steps:
+    - no: 1
+      action: 상단 [거래(전표) 입력]을 클릭한 뒤 왼쪽 [엑셀(전표) 입력]에서 [매입(현금영수증)]을 클릭합니다.
+      target: nav:거래(전표) 입력 > side:엑셀(전표) 입력 > 매입(현금영수증)
+      image: txn-excel-purchase-cash-01.png
+      note: 왼쪽 메뉴 이름 옆 숫자는 아직 처리하지 않은 건수입니다.
+    - no: 2
+      action: 이후 절차는 공통 문서를 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: txn-excel-bank
+  screen_name: 통장입출금
+  path: 거래(전표) 입력 > 엑셀(전표) 입력 > 통장입출금
+  pattern: pattern-excel
+  inherits: pattern-excel
+  permission: 거래(전표) 입력
+  draft: true                       # 화면 확인 중
+  purpose: 통장 입출금 내역을 엑셀로 한꺼번에 올린다
+
+  steps:
+    - no: 1
+      action: 상단 [거래(전표) 입력]을 클릭한 뒤 왼쪽 [엑셀(전표) 입력]에서 [통장입출금]을 클릭합니다.
+      target: nav:거래(전표) 입력 > side:엑셀(전표) 입력 > 통장입출금
+      image: txn-excel-bank-01.png
+      note: 왼쪽 메뉴 이름 옆 숫자는 아직 처리하지 않은 건수입니다.
+    - no: 2
+      action: 이후 절차는 공통 문서를 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+

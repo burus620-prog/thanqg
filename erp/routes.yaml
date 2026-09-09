@@ -1,0 +1,808 @@
+# 성공닷컴 캡처 경로 — 거래(전표) 입력
+#
+# 이 서비스는 화면마다 주소가 있다(.apro). 메뉴 이동이 주소로 되는지 확인되면
+# 아래 클릭 단계를 url 단계로 바꾸는 편이 훨씬 안정적이다.
+#
+#   - url: https://www.xn--ob0bs79awa206c7ov.com/어떤화면.apro
+#   - shot: 이름.png
+
+login:
+  url: https://www.xn--ob0bs79awa206c7ov.com/login.apro
+  env_id: SUCCESS_ID          # 아이디를 담을 환경변수 이름
+  env_pw: SUCCESS_PW          # 비밀번호를 담을 환경변수 이름
+  id_field: "input[type=text]"
+  pw_field: "input[type=password]"
+  submit: "로그인"
+  ready: 거래          # 로그인 후 화면에 보이는 글자. 띄어쓰기 차이를 피해 짧게 잡는다
+  complex: null
+
+# 이 서비스는 자료 조회도 POST 로 한다. 아래 조각이 주소에 들어 있으면 통과시킨다.
+# 그래야 화면에 자료가 채워진 상태로 찍힌다. 저장·삭제 계열은 계속 막힌다.
+allow_post:
+  - /collect        # collectSummary, collectTransPlus, collectTransMinus
+  - /search         # searchTransNm
+  - /get            # getMethodList, getNoticeAlarm
+  - listdata        # norMainListData, crefiaMainListData
+  - maindata
+  - data.apro       # taxBillHistoryData 등 조회성 요청
+  - detail          # serviceInfoDetail 등
+  - list            # transQuickListTotal 등
+  - /list
+  - /view
+  - /inquiry
+
+# 통과 목록에 걸리더라도 이 조각이 들어 있으면 무조건 막는다.
+deny_post:
+  - save
+  - insert
+  - update
+  - delete
+  - remove
+  - regist
+  - send
+  - submit
+
+# 자료 가리기. 아래 적은 열만 가리고 나머지는 그대로 둔다.
+#   · 제목 줄 이름으로 열을 찾는다. 표의 제목, 입력칸의 항목명·안내문구·라벨 모두 본다
+#   · 앞 세 글자만 남기고 ● 로 바꾼다  (주식회사 가나다상사 → 주식회●●●●●●●)
+#   · 날짜와 세 글자 이하 값은 그대로 둔다
+#   · "조회된 자료가 없습니다" 같은 안내 줄과 빈 표는 건드리지 않는다
+# 흐림이 아니라 글자를 바꾸는 방식이라 확대해도 복원되지 않는다.
+mask_data: true
+
+# 열 이름 뒤에 :숫자 를 붙이면 그 열만 남길 글자 수를 따로 정한다.
+# 안 붙이면 아래 mask_keep_chars 를 쓴다.
+mask_columns:
+  - 구분
+  - 거래처
+  - 거래처명
+  - 통장:2
+  - 적요:2
+  # 급여관리 화면
+  - 성명:1
+  - 이름:1
+  - 사원명:1
+  - 주민등록번호:0
+  - 계좌:2
+  - 계좌번호:2
+
+mask_keep_chars: 3        # 기본으로 남길 글자 수
+
+# 사업자등록번호·카드번호는 어느 열에 있든 가린다. 필요 없으면 false.
+mask_id_numbers: true
+
+# 특정 영역을 더 가리고 싶으면 CSS 선택자를 적는다. 브라우저 F12 로 확인한다.
+mask_global: []
+
+routes:
+
+  # 화면마다 실제 주소가 있으므로 클릭 대신 주소로 바로 이동한다.
+  # 주소는 브라우저에서 직접 확인한 값이다.
+  # 주소를 못 구한 화면은 아래쪽에 클릭 방식으로 따로 두었다.
+
+  - screen_id: acct-bs
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/tax/daechaSearch.apro
+      - wait: 2000
+      - shot: acct-bs-01.png
+
+  - screen_id: acct-is
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/tax/sonikSearch.apro
+      - wait: 2000
+      - shot: acct-is-01.png
+
+  - screen_id: acct-cost-mfg
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/tax/jejoSearch.apro
+      - wait: 2000
+      - shot: acct-cost-mfg-01.png
+
+  - screen_id: acct-trial
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/tax/hapkyeSearch.apro
+      - wait: 2000
+      - shot: acct-trial-01.png
+
+  - screen_id: acct-cost-const
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/tax/gongsaSearch.apro
+      - wait: 2000
+      - shot: acct-cost-const-01.png
+
+  - screen_id: acct-sub
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/tax/supplementSearch.apro
+      - wait: 2000
+      - shot: acct-sub-01.png
+
+  - screen_id: acct-prev-bs
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/info/basicInputFinancial.apro
+      - wait: 2000
+      - shot: acct-prev-bs-01.png
+
+  - screen_id: eapp-archive
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/document/all/list.apro
+      - wait: 2000
+      - shot: eapp-archive-01.png
+
+  - screen_id: eapp-draft
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/document/draft/list.apro
+      - wait: 2000
+      - shot: eapp-draft-01.png
+
+  - screen_id: eapp-done
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/document/complete/list.apro
+      - wait: 2000
+      - shot: eapp-done-01.png
+
+  - screen_id: eapp-waiting
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/document/waiting/list.apro
+      - wait: 2000
+      - shot: eapp-waiting-01.png
+
+  - screen_id: eapp-rejected
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/document/return/list.apro
+      - wait: 2000
+      - shot: eapp-rejected-01.png
+
+  - screen_id: eapp-circular
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/document/recipient/list.apro
+      - wait: 2000
+      - shot: eapp-circular-01.png
+
+  - screen_id: eapp-trash
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/document/recycle/list.apro
+      - wait: 2000
+      - shot: eapp-trash-01.png
+
+  - screen_id: eapp-line
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/document/setAuthLine.apro
+      - wait: 2000
+      - shot: eapp-line-01.png
+
+  - screen_id: eapp-form
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/document/setDocType.apro
+      - wait: 2000
+      - shot: eapp-form-01.png
+
+  - screen_id: fin-inout-list
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/auto/bankHist.apro
+      - wait: 2000
+      - shot: fin-inout-list-01.png
+
+  - screen_id: fin-transfer
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/united/unitedAccountTransfer.apro
+      - wait: 2000
+      - shot: fin-transfer-01.png
+
+  - screen_id: fin-book-bank
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/financial/businessAccountCompareDay.apro
+      - wait: 2000
+      - shot: fin-book-bank-01.png
+
+  - screen_id: fin-sb-inout
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/fundmanage/cashFlowManage.apro
+      - wait: 2000
+      - shot: fin-sb-inout-01.png
+
+  - screen_id: fin-in-receivable
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/auto/bankMain.apro
+      - wait: 2000
+      - shot: fin-in-receivable-01.png
+
+  - screen_id: fin-in-pg
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/quick/managePg.apro
+      - wait: 2000
+      - shot: fin-in-pg-01.png
+
+  - screen_id: fin-in-card
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/quick/manageCrefia.apro
+      - wait: 2000
+      - shot: fin-in-card-01.png
+
+  - screen_id: fin-out-card
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/quick/manageCard.apro
+      - wait: 2000
+      - shot: fin-out-card-01.png
+      - shot: fin-out-card-02.png
+
+  - screen_id: fin-out-tax
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/united/unitedEmployeeInsur.apro
+      - wait: 2000
+      - shot: fin-out-tax-01.png
+
+  - screen_id: fin-out-advance
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/united/unitedEmployeePay.apro
+      - wait: 2000
+      - shot: fin-out-advance-01.png
+
+  - screen_id: fin-loan
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/fund/borrowList.apro
+      - wait: 2000
+      - shot: fin-loan-01.png
+
+  - screen_id: fin-cashbook
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/fundmanage/totalCashFlowView.apro
+      - wait: 2000
+      - shot: fin-cashbook-01.png
+
+  - screen_id: fin-note
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/fund/billList.apro
+      - wait: 2000
+      - shot: fin-note-01.png
+
+  - screen_id: inv-statement
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/salesmanage/regTransState.apro
+      - wait: 2000
+      - shot: inv-statement-01.png
+      - shot: inv-statement-02.png
+
+  - screen_id: inv-daily
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/customer/businessReport.apro
+      - wait: 2000
+      - shot: inv-daily-01.png
+
+  - screen_id: inv-stock
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/product/productInout.apro
+      - wait: 2000
+      - shot: inv-stock-01.png
+
+  - screen_id: inv-product
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/product/productList.apro
+      - wait: 2000
+      - shot: inv-product-01.png
+
+  - screen_id: inv-product-sales
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/management/bizReportProductCate.apro
+      - wait: 2000
+      - shot: inv-product-sales-01.png
+
+  - screen_id: base-biz
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/info/academyInfo.apro
+      - wait: 2000
+      - shot: base-biz-01.png
+
+  - screen_id: base-filing
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/info/registerInfo.apro
+      - wait: 2000
+      - shot: base-filing-01.png
+
+  - screen_id: base-bank-card
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/info/financeInfoManager.apro
+      - wait: 2000
+      - shot: base-bank-card-01.png
+
+  - screen_id: base-partner
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/customer/custList.apro
+      - wait: 2000
+      - shot: base-partner-01.png
+
+  - screen_id: base-project-input
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/project/projectList.apro
+      - wait: 2000
+      - shot: base-project-input-01.png
+
+  - screen_id: base-project-status
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/management/bizReportProject.apro
+      - wait: 2000
+      - shot: base-project-status-01.png
+
+  - screen_id: base-rental
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/info/realEstate.apro
+      - wait: 2000
+      - shot: base-rental-01.png
+
+  - screen_id: base-user
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/info/memberList.apro
+      - wait: 2000
+      - shot: base-user-01.png
+
+  - screen_id: base-dealname
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/info/transcodeList.apro
+      - wait: 2000
+      - shot: base-dealname-01.png
+
+  - screen_id: base-asset
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/financial/jasanList.apro
+      - wait: 2000
+      - shot: base-asset-01.png
+
+  - screen_id: pay-employee
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/employee/empList.apro
+      - wait: 2000
+      - shot: pay-employee-01.png
+
+  - screen_id: pay-pay
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/employee/salaryJung.apro
+      - wait: 2000
+      - shot: pay-pay-01.png
+
+  - screen_id: pay-book
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/employee/salaryReport.apro
+      - wait: 2000
+      - shot: pay-book-01.png
+
+  - screen_id: pay-attendance
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/employee/workReport.apro
+      - wait: 2000
+      - shot: pay-attendance-01.png
+
+  - screen_id: pay-payslip
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/employee/payrollStateJung.apro
+      - wait: 2000
+      - shot: pay-payslip-01.png
+
+  - screen_id: pay-yearend
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/employee/yearEndTaxAdjustment.apro
+      - wait: 2000
+      - shot: pay-yearend-01.png
+
+  - screen_id: pay-severance
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/employee/retirementPay.apro
+      - wait: 2000
+      - shot: pay-severance-01.png
+
+  - screen_id: pay-severance-book
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/employee/severanceReport.apro
+      - wait: 2000
+      - shot: pay-severance-book-01.png
+
+  - screen_id: pay-insurance
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/insurance/dashBoard.apro
+      - wait: 2000
+      - shot: pay-insurance-01.png
+
+  - screen_id: pay-wht-link
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/report/taxWonFrame.apro
+      - wait: 2000
+      - shot: pay-wht-link-01.png
+
+  - screen_id: rpt-financial
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/fundmanage/dailyScrapReport.apro
+      - wait: 2000
+      - shot: rpt-financial-01.png
+
+  - screen_id: rpt-tax-summary
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/serviceTax.apro
+      - wait: 2000
+      - shot: rpt-tax-summary-01.png
+
+  - screen_id: rpt-sp-summary
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/serviceInout.apro
+      - wait: 2000
+      - shot: rpt-sp-summary-01.png
+
+  - screen_id: rpt-sp-manage
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/management/bizReportCustomer.apro
+      - wait: 2000
+      - shot: rpt-sp-manage-01.png
+
+  - screen_id: rpt-receivable-payable
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/financial/customerFinancialRemain.apro
+      - wait: 2000
+      - shot: rpt-receivable-payable-01.png
+
+  - screen_id: rpt-m-performance
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/management/resultCheck.apro
+      - wait: 2000
+      - shot: rpt-m-performance-01.png
+
+  - screen_id: rpt-m-position
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/management/financialReport.apro
+      - wait: 2000
+      - shot: rpt-m-position-01.png
+
+  - screen_id: rpt-m-stat
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/management/resultCheckStatistics.apro
+      - wait: 2000
+      - shot: rpt-m-stat-01.png
+
+  - screen_id: rpt-m-fstat
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/management/financialReportStatistics.apro
+      - wait: 2000
+      - shot: rpt-m-fstat-01.png
+
+  - screen_id: rpt-b-compare
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/serviceManagement.apro
+      - wait: 2000
+      - shot: rpt-b-compare-01.png
+
+  - screen_id: rpt-b-fund
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/serviceFinance.apro
+      - wait: 2000
+      - shot: rpt-b-fund-01.png
+
+  - screen_id: rpt-b-expense
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/serviceCost.apro
+      - wait: 2000
+      - shot: rpt-b-expense-01.png
+
+  - screen_id: rpt-b-payroll
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/serviceSalary.apro
+      - wait: 2000
+      - shot: rpt-b-payroll-01.png
+
+  - screen_id: rpt-b-limit
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/service/financeLimit.apro
+      - wait: 2000
+      - shot: rpt-b-limit-01.png
+
+  - screen_id: rpt-m-ledger
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/management/bizReportTransactionCate.apro
+      - wait: 2000
+      - shot: rpt-m-ledger-01.png
+
+  - screen_id: rpt-m-pl
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/management/bizReportTransaction.apro
+      - wait: 2000
+      - shot: rpt-m-pl-01.png
+
+  - screen_id: rpt-m-total
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/financial/gaejungList.apro
+      - wait: 2000
+      - shot: rpt-m-total-01.png
+
+  - screen_id: rpt-m-journal
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/financial/bungaeList.apro
+      - wait: 2000
+      - shot: rpt-m-journal-01.png
+
+  - screen_id: sp-voucher
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/financial/transQuickList.apro
+      - wait: 2000
+      - shot: sp-voucher-01.png
+
+  - screen_id: sp-tax-issued
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/financial/taxBillHistory.apro
+      - wait: 2000
+      - shot: sp-tax-issued-01.png
+
+  - screen_id: sp-vat-link
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/financial/taxinvoiceTransList.apro
+      - wait: 2000
+      - shot: sp-vat-link-01.png
+
+  - screen_id: acct-vat-unincluded
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/financial/taxinvoiceTransList.apro
+      - wait: 2000
+      - shot: acct-vat-unincluded-01.png
+
+  - screen_id: acct-vat-included
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/financial/taxinvoiceEndList.apro
+      - wait: 2000
+      - shot: acct-vat-included-01.png
+
+  - screen_id: acct-vat-verify
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/report/vatCheckTransList.apro
+      - wait: 2000
+      - shot: acct-vat-verify-01.png
+
+  - screen_id: acct-vat-form
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/report/taxVatFrame.apro
+      - wait: 2000
+      - shot: acct-vat-form-01.png
+
+  - screen_id: acct-vat-list
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/report/taxHistory.apro
+      - wait: 2000
+      - shot: acct-vat-list-01.png
+
+  - screen_id: acct-wht-form
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/report/taxWonFrame.apro
+      - wait: 2000
+      - shot: acct-wht-form-01.png
+
+  - screen_id: acct-wht-daily
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/report/taxEmpILFrame.apro
+      - wait: 2000
+      - shot: acct-wht-daily-01.png
+
+  - screen_id: acct-wht-biz
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/report/taxEmpBusiFrame.apro
+      - wait: 2000
+      - shot: acct-wht-biz-01.png
+
+  - screen_id: acct-wht-etc
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/report/taxEmpEtcFrame.apro
+      - wait: 2000
+      - shot: acct-wht-etc-01.png
+
+  - screen_id: acct-wht-simple-labor
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/report/taxWonGanFrame.apro
+      - wait: 2000
+      - shot: acct-wht-simple-labor-01.png
+
+  - screen_id: acct-wht-simple-biz
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/report/taxSodukBusiGanFrame.apro
+      - wait: 2000
+      - shot: acct-wht-simple-biz-01.png
+
+  - screen_id: acct-biz-status
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/report/taxBusinessFrame.apro
+      - wait: 2000
+      - shot: acct-biz-status-01.png
+
+  - screen_id: acct-corp
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/report/taxCorporationFrame.apro
+      - wait: 2000
+      - shot: acct-corp-01.png
+
+  - screen_id: acct-income
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/report/taxIncomeFrame.apro
+      - wait: 2000
+      - shot: acct-income-01.png
+
+  - screen_id: txn-auto-sales-tax
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/auto/taxBillMain.apro?inout=I
+      - wait: 2000
+      - shot: txn-auto-sales-tax-01.png
+
+  - screen_id: txn-auto-sales-card
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/auto/crefiaMain.apro
+      - wait: 2000
+      - shot: txn-auto-sales-card-01.png
+
+  - screen_id: txn-auto-sales-cash
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/auto/cashInMain.apro
+      - wait: 2000
+      - shot: txn-auto-sales-cash-01.png
+
+  - screen_id: txn-auto-purchase-tax
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/auto/taxBillMain.apro?inout=O
+      - wait: 2000
+      - shot: txn-auto-purchase-tax-01.png
+
+  - screen_id: txn-auto-purchase-card
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/auto/norMain.apro
+      - wait: 2000
+      - shot: txn-auto-purchase-card-01.png
+
+  - screen_id: txn-auto-purchase-cash
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/auto/cashOutMain.apro
+      - wait: 2000
+      - shot: txn-auto-purchase-cash-01.png
+
+  - screen_id: txn-excel-tax
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/auto/uploadTaxbillMain.apro
+      - wait: 2000
+      - shot: txn-excel-tax-01.png
+
+  - screen_id: txn-excel-card-expense
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/auto/uploadCardMain.apro
+      - wait: 2000
+      - shot: txn-excel-card-expense-01.png
+
+  - screen_id: txn-excel-card-sales
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/auto/uploadCrefiaMain.apro
+      - wait: 2000
+      - shot: txn-excel-card-sales-01.png
+
+  - screen_id: txn-excel-sales-cash
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/auto/uploadCashInMain.apro
+      - wait: 2000
+      - shot: txn-excel-sales-cash-01.png
+
+  - screen_id: txn-excel-purchase-cash
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/auto/uploadCashOutMain.apro
+      - wait: 2000
+      - shot: txn-excel-purchase-cash-01.png
+
+  - screen_id: txn-excel-bank
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/auto/uploadBankMain.apro
+      - wait: 2000
+      - shot: txn-excel-bank-01.png
+
+  # ── 아래 13개는 주소가 같고 화면 안에서만 갈리므로 클릭으로 이동한다.
+  # 실패하면 Claude in Chrome 으로 따로 찍는다.
+
+  - screen_id: fin-in-etc
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/auto/bankHist.apro
+      - wait: 2000
+      - text: 기타내역 수납확인
+        within: 입금 내역
+      - wait: 1800
+      - shot: fin-in-etc-01.png
+
+  - screen_id: fin-out-payable
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/auto/bankHist.apro
+      - wait: 2000
+      - text: 외상매입금 지급확인
+        within: 출금 내역
+      - wait: 1800
+      - shot: fin-out-payable-01.png
+
+  - screen_id: fin-out-etc
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/auto/bankHist.apro
+      - wait: 2000
+      - text: 기타내역 지급확인
+        within: 출금 내역
+      - wait: 1800
+      - shot: fin-out-etc-01.png
+
+  - screen_id: fin-lending
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/auto/bankHist.apro
+      - wait: 2000
+      - text: 대여금(빌려준돈)
+        within: 기타(금융) 자산
+      - wait: 1800
+      - shot: fin-lending-01.png
+
+  - screen_id: sp-sales-tax
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/financial/transQuickList.apro
+      - wait: 2000
+      - text: 매출(전자세금계산서)
+        within: 매출관리
+      - wait: 1800
+      - shot: sp-sales-tax-01.png
+
+  - screen_id: sp-sales-card
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/financial/transQuickList.apro
+      - wait: 2000
+      - text: 매출(카드)
+        within: 매출관리
+      - wait: 1800
+      - shot: sp-sales-card-01.png
+
+  - screen_id: sp-sales-cash
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/financial/transQuickList.apro
+      - wait: 2000
+      - text: 매출(현금영수증)
+        within: 매출관리
+      - wait: 1800
+      - shot: sp-sales-cash-01.png
+
+  - screen_id: sp-sales-etc
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/financial/transQuickList.apro
+      - wait: 2000
+      - text: 매출(기타영수증)
+        within: 매출관리
+      - wait: 1800
+      - shot: sp-sales-etc-01.png
+
+  - screen_id: sp-expense-report
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/financial/transQuickList.apro
+      - wait: 2000
+      - text: 지출결의서(출력)
+      - wait: 1800
+      - shot: sp-expense-report-01.png
+
+  - screen_id: sp-purchase-tax
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/financial/transQuickList.apro
+      - wait: 2000
+      - text: 매입(전자세금계산서)
+        within: 매입관리
+      - wait: 1800
+      - shot: sp-purchase-tax-01.png
+
+  - screen_id: sp-purchase-card
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/financial/transQuickList.apro
+      - wait: 2000
+      - text: 매입(카드)
+        within: 매입관리
+      - wait: 1800
+      - shot: sp-purchase-card-01.png
+
+  - screen_id: sp-purchase-cash
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/financial/transQuickList.apro
+      - wait: 2000
+      - text: 매입(현금영수증)
+        within: 매입관리
+      - wait: 1800
+      - shot: sp-purchase-cash-01.png
+
+  - screen_id: sp-purchase-etc
+    steps:
+      - url: https://www.xn--ob0bs79awa206c7ov.com/erp/erpweb/financial/transQuickList.apro
+      - wait: 2000
+      - text: 매입(기타영수증)
+        within: 매입관리
+      - wait: 1800
+      - shot: sp-purchase-etc-01.png

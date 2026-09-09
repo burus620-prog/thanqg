@@ -1,0 +1,416 @@
+# 성공닷컴 사용자 매뉴얼 원본 — 금융(입출금)
+# 실제 왼쪽 메뉴 구성에 맞춰 작성. 화면 17개.
+#   입출금 내역 4 / 입금 내역 4 / 출금 내역 5 / 기타(금융) 자산 4
+
+- screen_id: fin-inout-list
+  screen_name: 입출금 내역 조회
+  path: 금융(입출금) > 입출금 내역 > 입출금 내역 조회
+  pattern: D
+  inherits: pattern-settle
+  permission: 금융(입출금)
+  draft: true                       # 화면 확인 중
+  purpose: 통장에 들어오고 나간 내역을 한곳에서 조회한다
+  key_concept: >
+    은행과 카드사에서 가져온 통장 거래가 모두 모이는 곳이다.
+    화면 위에 "은행/금융사 통장내역 가져오기를 통해 수집한 전표입니다"라고 적혀 있다.
+    여기 있는 자료를 가지고 아래 수납·지급 확인을 한다.
+
+  columns: [일자, 구분, 계좌정보, 입금, 출금, 잔액, 적요, 메모]
+
+  steps:
+    - no: 1
+      action: 상단 [금융(입출금)]을 클릭한 뒤 왼쪽 [입출금 내역]에서 [입출금 내역 조회]을 클릭합니다.
+      target: nav:금융(입출금) > side:입출금 내역 > 입출금 내역 조회
+      image: fin-inout-list-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: fin-transfer
+  screen_name: 내부 계좌 간 간편 이체
+  path: 금융(입출금) > 입출금 내역 > 내부 계좌 간 간편 이체
+  pattern: B
+  inherits: pattern-settle
+  permission: 금융(입출금)
+  draft: true                       # 화면 확인 중
+  purpose: 우리 계좌끼리 옮긴 돈을 처리한다
+
+  steps:
+    - no: 1
+      action: 상단 [금융(입출금)]을 클릭한 뒤 왼쪽 [입출금 내역]에서 [내부 계좌 간 간편 이체]을 클릭합니다.
+      target: nav:금융(입출금) > side:입출금 내역 > 내부 계좌 간 간편 이체
+      image: fin-transfer-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: fin-book-bank
+  screen_name: 장부 vs 은행 비교
+  path: 금융(입출금) > 입출금 내역 > 장부 vs 은행 비교
+  pattern: D
+  inherits: pattern-settle
+  permission: 금융(입출금)
+  draft: true                       # 화면 확인 중
+  purpose: 장부 잔액과 실제 은행 잔액이 맞는지 비교한다
+
+  steps:
+    - no: 1
+      action: 상단 [금융(입출금)]을 클릭한 뒤 왼쪽 [입출금 내역]에서 [장부 vs 은행 비교]을 클릭합니다.
+      target: nav:금융(입출금) > side:입출금 내역 > 장부 vs 은행 비교
+      image: fin-book-bank-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: fin-sb-inout
+  screen_name: 성공장부 입출금 내역
+  path: 금융(입출금) > 입출금 내역 > 성공장부 입출금 내역
+  pattern: D
+  inherits: pattern-settle
+  permission: 금융(입출금)
+  draft: true                       # 화면 확인 중
+  purpose: 성공장부에 기록된 입출금을 조회한다
+
+  steps:
+    - no: 1
+      action: 상단 [금융(입출금)]을 클릭한 뒤 왼쪽 [입출금 내역]에서 [성공장부 입출금 내역]을 클릭합니다.
+      target: nav:금융(입출금) > side:입출금 내역 > 성공장부 입출금 내역
+      image: fin-sb-inout-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: fin-in-receivable
+  screen_name: 외상매출금 수납확인
+  path: 금융(입출금) > 입금 내역 > 외상매출금 수납확인
+  pattern: pattern-settle
+  inherits: pattern-settle
+  permission: 금융(입출금)
+  draft: true                       # 화면 확인 중
+  purpose: 매출로 잡았지만 아직 못 받은 돈이 실제로 들어왔는지 맞춘다
+
+  steps:
+    - no: 1
+      action: 상단 [금융(입출금)]을 클릭한 뒤 왼쪽 [입금 내역]에서 [외상매출금 수납확인]을 클릭합니다.
+      target: nav:금융(입출금) > side:입금 내역 > 외상매출금 수납확인
+      image: fin-in-receivable-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: fin-in-pg
+  screen_name: 오픈마켓/PG 정산수납확인
+  path: 금융(입출금) > 입금 내역 > 오픈마켓/PG 정산수납확인
+  pattern: pattern-settle
+  inherits: pattern-settle
+  permission: 금융(입출금)
+  draft: true                       # 화면 확인 중
+  purpose: 오픈마켓과 결제대행사에서 정산받은 돈을 맞춘다
+
+  steps:
+    - no: 1
+      action: 상단 [금융(입출금)]을 클릭한 뒤 왼쪽 [입금 내역]에서 [오픈마켓/PG 정산수납확인]을 클릭합니다.
+      target: nav:금융(입출금) > side:입금 내역 > 오픈마켓/PG 정산수납확인
+      image: fin-in-pg-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: fin-in-card
+  screen_name: 카드매출정산 수납확인
+  path: 금융(입출금) > 입금 내역 > 카드매출정산 수납확인
+  pattern: pattern-settle
+  inherits: pattern-settle
+  permission: 금융(입출금)
+  draft: true                       # 화면 확인 중
+  purpose: 카드 매출이 언제 얼마로 정산되어 들어왔는지 맞춘다
+
+  steps:
+    - no: 1
+      action: 상단 [금융(입출금)]을 클릭한 뒤 왼쪽 [입금 내역]에서 [카드매출정산 수납확인]을 클릭합니다.
+      target: nav:금융(입출금) > side:입금 내역 > 카드매출정산 수납확인
+      image: fin-in-card-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: fin-in-etc
+  screen_name: 기타내역 수납확인
+  path: 금융(입출금) > 입금 내역 > 기타내역 수납확인
+  pattern: pattern-settle
+  inherits: pattern-settle
+  permission: 금융(입출금)
+  draft: true                       # 화면 확인 중
+  purpose: 위에 해당하지 않는 입금을 맞춘다
+
+  steps:
+    - no: 1
+      action: 상단 [금융(입출금)]을 클릭한 뒤 왼쪽 [입금 내역]에서 [기타내역 수납확인]을 클릭합니다.
+      target: nav:금융(입출금) > side:입금 내역 > 기타내역 수납확인
+      image: fin-in-etc-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: fin-out-payable
+  screen_name: 외상매입금 지급확인
+  path: 금융(입출금) > 출금 내역 > 외상매입금 지급확인
+  pattern: pattern-settle
+  inherits: pattern-settle
+  permission: 금융(입출금)
+  draft: true                       # 화면 확인 중
+  purpose: 매입으로 잡았지만 아직 안 준 돈이 실제로 나갔는지 맞춘다
+
+  steps:
+    - no: 1
+      action: 상단 [금융(입출금)]을 클릭한 뒤 왼쪽 [출금 내역]에서 [외상매입금 지급확인]을 클릭합니다.
+      target: nav:금융(입출금) > side:출금 내역 > 외상매입금 지급확인
+      image: fin-out-payable-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: fin-out-card
+  screen_name: 카드대금 지급확인
+  path: 금융(입출금) > 출금 내역 > 카드대금 지급확인
+  pattern: pattern-settle
+  inherits: pattern-settle
+  permission: 금융(입출금)
+  draft: true                       # 화면 확인 중
+  purpose: 카드 대금이 결제일에 얼마나 빠져나갔는지 맞춘다
+
+  screen_specific:
+    - name: 지급처리 / 카드사용내역 탭
+      desc: 정산을 처리하는 [지급처리]와, 카드로 쓴 내역을 보는 [카드사용내역]으로 나뉩니다.
+    - name: 카드사별 미지급금
+      desc: >
+        왼쪽에 카드사별로 아직 결제되지 않은 금액이 나옵니다.
+        맨 아래 합계가 지금 갚아야 할 카드 대금 전체입니다.
+    - name: 상세
+      desc: 카드사별로 어떤 거래가 미지급으로 남아 있는지 봅니다.
+    - name: 은행거래 출금내역
+      desc: 오른쪽에 통장에서 나간 내역이 나옵니다. 기간과 적요로 찾습니다.
+
+  steps:
+    - no: 1
+      action: 상단 [금융(입출금)]을 클릭한 뒤 왼쪽 [출금 내역]에서 [카드대금 지급확인]을 클릭합니다.
+      target: nav:금융(입출금) > side:출금 내역 > 카드대금 지급확인
+      image: fin-out-card-01.png
+      note: 처음 열면 [지급처리] 탭이 보입니다.
+    - no: 2
+      action: 카드로 쓴 내역만 보려면 [카드사용내역] 탭을 클릭합니다.
+      target: tab:카드사용내역
+      image: fin-out-card-02.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: fin-out-tax
+  screen_name: 4대보험/세금 납부확인
+  path: 금융(입출금) > 출금 내역 > 4대보험/세금 납부확인
+  pattern: pattern-settle
+  inherits: pattern-settle
+  permission: 금융(입출금)
+  draft: true                       # 화면 확인 중
+  purpose: 4대보험료와 세금이 실제로 납부되었는지 맞춘다
+
+  steps:
+    - no: 1
+      action: 상단 [금융(입출금)]을 클릭한 뒤 왼쪽 [출금 내역]에서 [4대보험/세금 납부확인]을 클릭합니다.
+      target: nav:금융(입출금) > side:출금 내역 > 4대보험/세금 납부확인
+      image: fin-out-tax-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: fin-out-advance
+  screen_name: 임직원 선지출 경비 정산
+  path: 금융(입출금) > 출금 내역 > 임직원 선지출 경비 정산
+  pattern: pattern-settle
+  inherits: pattern-settle
+  permission: 금융(입출금)
+  draft: true                       # 화면 확인 중
+  purpose: 직원이 먼저 쓴 돈을 정산해 준 내역을 맞춘다
+
+  steps:
+    - no: 1
+      action: 상단 [금융(입출금)]을 클릭한 뒤 왼쪽 [출금 내역]에서 [임직원 선지출 경비 정산]을 클릭합니다.
+      target: nav:금융(입출금) > side:출금 내역 > 임직원 선지출 경비 정산
+      image: fin-out-advance-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: fin-out-etc
+  screen_name: 기타내역 지급확인
+  path: 금융(입출금) > 출금 내역 > 기타내역 지급확인
+  pattern: pattern-settle
+  inherits: pattern-settle
+  permission: 금융(입출금)
+  draft: true                       # 화면 확인 중
+  purpose: 위에 해당하지 않는 출금을 맞춘다
+
+  steps:
+    - no: 1
+      action: 상단 [금융(입출금)]을 클릭한 뒤 왼쪽 [출금 내역]에서 [기타내역 지급확인]을 클릭합니다.
+      target: nav:금융(입출금) > side:출금 내역 > 기타내역 지급확인
+      image: fin-out-etc-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: fin-loan
+  screen_name: 대출금(차입금,빌린돈)
+  path: 금융(입출금) > 기타(금융) 자산 > 대출금(차입금,빌린돈)
+  pattern: A
+  inherits: pattern-finasset
+  permission: 금융(입출금)
+  draft: true                       # 화면 확인 중
+  purpose: 빌린 돈을 등록하고 남은 원금과 이자를 관리한다
+
+  steps:
+    - no: 1
+      action: 상단 [금융(입출금)]을 클릭한 뒤 왼쪽 [기타(금융) 자산]에서 [대출금(차입금,빌린돈)]을 클릭합니다.
+      target: nav:금융(입출금) > side:기타(금융) 자산 > 대출금(차입금,빌린돈)
+      image: fin-loan-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: fin-lending
+  screen_name: 대여금(빌려준돈)
+  path: 금융(입출금) > 기타(금융) 자산 > 대여금(빌려준돈)
+  pattern: A
+  inherits: pattern-finasset
+  permission: 금융(입출금)
+  draft: true                       # 화면 확인 중
+  purpose: 빌려준 돈을 등록하고 회수 상황을 관리한다
+
+  steps:
+    - no: 1
+      action: 상단 [금융(입출금)]을 클릭한 뒤 왼쪽 [기타(금융) 자산]에서 [대여금(빌려준돈)]을 클릭합니다.
+      target: nav:금융(입출금) > side:기타(금융) 자산 > 대여금(빌려준돈)
+      image: fin-lending-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: fin-cashbook
+  screen_name: 현금출납장
+  path: 금융(입출금) > 기타(금융) 자산 > 현금출납장
+  pattern: A
+  inherits: pattern-finasset
+  permission: 금융(입출금)
+  draft: true                       # 화면 확인 중
+  purpose: 현금이 들어오고 나간 내역을 기록한다
+
+  steps:
+    - no: 1
+      action: 상단 [금융(입출금)]을 클릭한 뒤 왼쪽 [기타(금융) 자산]에서 [현금출납장]을 클릭합니다.
+      target: nav:금융(입출금) > side:기타(금융) 자산 > 현금출납장
+      image: fin-cashbook-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+
+---
+
+- screen_id: fin-note
+  screen_name: 어음대장
+  path: 금융(입출금) > 기타(금융) 자산 > 어음대장
+  pattern: A
+  inherits: pattern-finasset
+  permission: 금융(입출금)
+  draft: true                       # 화면 확인 중
+  purpose: 받은 어음과 준 어음을 관리한다
+
+  steps:
+    - no: 1
+      action: 상단 [금융(입출금)]을 클릭한 뒤 왼쪽 [기타(금융) 자산]에서 [어음대장]을 클릭합니다.
+      target: nav:금융(입출금) > side:기타(금융) 자산 > 어음대장
+      image: fin-note-01.png
+      note: null
+
+  cautions:
+    []
+
+  faq: []
+

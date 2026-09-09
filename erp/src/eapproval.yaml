@@ -1,0 +1,332 @@
+# 성공닷컴 사용자 매뉴얼 원본 — 전자결재
+# 전자문서함 7개 + 관리설정 2개. 모두 공통 문서를 상속한다.
+
+- screen_id: eapp-archive
+  screen_name: 전자문서 보관함
+  path: 전자결재 > 전자문서함 > 전자문서 보관함
+  pattern: A
+  inherits: pattern-eapproval
+  permission: 전자결재
+  purpose: 모든 전자문서를 한곳에서 찾아본다
+
+  key_concept: >
+    문서함 중 가장 넓은 곳이다.
+    어느 함에 있는지 모를 때 여기서 찾으면 된다.
+
+  screen_specific:
+    - name: 조회 조건
+      desc: >
+        유형과 상태, 기간, 제목으로 찾습니다.
+        [수신/회람문서 제외]를 체크하면 결재 문서만 봅니다.
+        더 세밀하게 찾으려면 [상세검색]을 씁니다.
+    - name: 새 결재 작성
+      desc: 오른쪽 위 버튼으로 새 문서를 올립니다.
+    - name: 표 항목
+      desc: 문서번호, 유형, 제목, 작성자, 결재상태, 작성일
+
+  steps:
+    - no: 1
+      action: 상단 [전자결재]를 클릭합니다.
+      target: nav:전자결재
+      image: eapp-archive-01.png
+      note: 처음 열면 [전자문서 보관함]이 보입니다.
+    - no: 2
+      action: 유형·상태·기간·제목으로 문서를 찾습니다.
+      target: null
+      image: null
+      note: 결재 문서만 보려면 [수신/회람문서 제외]를 체크합니다.
+    - no: 3
+      action: 새 문서를 올리려면 오른쪽 위 [새 결재 작성]을 클릭합니다.
+      target: null
+      image: null
+      note: 결재선과 문서양식이 미리 만들어져 있어야 합니다.
+
+  cautions:
+    - "문서를 올리기 전에 [관리설정]에서 결재라인과 문서양식을 먼저 만들어야 합니다."
+
+  faq:
+    - q: 문서가 어디 있는지 모르겠습니다.
+      a: 여기서 제목이나 기간으로 찾으세요. 모든 문서가 모이는 곳입니다.
+    - q: 새 문서는 어디서 올리나요?
+      a: 오른쪽 위 [새 결재 작성]을 클릭합니다.
+
+---
+
+- screen_id: eapp-draft
+  screen_name: 기안문서
+  path: 전자결재 > 전자문서함 > 기안문서
+  pattern: A
+  inherits: pattern-eapproval
+  permission: 전자결재
+  draft: true                       # 화면 확인 전 뼈대
+  purpose: 내가 올린 문서를 본다
+
+  steps:
+    - no: 1
+      action: 상단 [전자결재]를 클릭한 뒤 [전자문서함]에서 [기안문서]을 클릭합니다.
+      target: nav:전자결재 > 전자문서함 > 기안문서
+      image: eapp-draft-01.png
+      note: null
+    - no: 2
+      action: 이후 절차는 공통 문서를 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []   # 확인필요: 이 화면만의 주의사항
+
+  faq: []
+
+---
+
+- screen_id: eapp-done
+  screen_name: 결재 완료문서
+  path: 전자결재 > 전자문서함 > 결재 완료문서
+  pattern: A
+  inherits: pattern-eapproval
+  permission: 전자결재
+  draft: true                       # 화면 확인 전 뼈대
+  purpose: 결재가 끝난 문서를 본다
+
+  steps:
+    - no: 1
+      action: 상단 [전자결재]를 클릭한 뒤 [전자문서함]에서 [결재 완료문서]을 클릭합니다.
+      target: nav:전자결재 > 전자문서함 > 결재 완료문서
+      image: eapp-done-01.png
+      note: null
+    - no: 2
+      action: 이후 절차는 공통 문서를 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []   # 확인필요: 이 화면만의 주의사항
+
+  faq: []
+
+---
+
+- screen_id: eapp-waiting
+  screen_name: 결재 대기문서
+  path: 전자결재 > 전자문서함 > 결재 대기문서
+  pattern: A
+  inherits: pattern-eapproval
+  permission: 전자결재
+  draft: true                       # 화면 확인 전 뼈대
+  purpose: 내가 결재해야 할 문서를 본다
+  key_concept: >
+    다른 사람이 올린 문서 중 **내 차례가 된 것**만 모인다.
+    여기 쌓이면 결재가 밀리는 것이므로, 출근해서 가장 먼저 보는 화면이 되는 경우가 많다.
+
+  steps:
+    - no: 1
+      action: 상단 [전자결재]를 클릭한 뒤 [전자문서함]에서 [결재 대기문서]을 클릭합니다.
+      target: nav:전자결재 > 전자문서함 > 결재 대기문서
+      image: eapp-waiting-01.png
+      note: null
+    - no: 2
+      action: 이후 절차는 공통 문서를 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []   # 확인필요: 이 화면만의 주의사항
+
+  faq: []
+
+---
+
+- screen_id: eapp-rejected
+  screen_name: 반려문서
+  path: 전자결재 > 전자문서함 > 반려문서
+  pattern: A
+  inherits: pattern-eapproval
+  permission: 전자결재
+  draft: true                       # 화면 확인 전 뼈대
+  purpose: 되돌아온 문서를 본다
+  key_concept: >
+    결재자가 되돌려 보낸 문서다. 반려 사유를 확인하고 고쳐서 다시 올린다.
+    반려는 문서가 사라지는 것이 아니라 기안자에게 돌아오는 것이다.
+
+  steps:
+    - no: 1
+      action: 상단 [전자결재]를 클릭한 뒤 [전자문서함]에서 [반려문서]을 클릭합니다.
+      target: nav:전자결재 > 전자문서함 > 반려문서
+      image: eapp-rejected-01.png
+      note: null
+    - no: 2
+      action: 이후 절차는 공통 문서를 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []   # 확인필요: 이 화면만의 주의사항
+
+  faq: []
+
+---
+
+- screen_id: eapp-circular
+  screen_name: 수신/회람
+  path: 전자결재 > 전자문서함 > 수신/회람
+  pattern: A
+  inherits: pattern-eapproval
+  permission: 전자결재
+  draft: true                       # 화면 확인 전 뼈대
+  purpose: 결재가 아니라 알려주려고 돌린 문서를 본다
+  key_concept: >
+    결재를 받으려는 것이 아니라 **알려주려고** 돌린 문서다.
+    승인이 필요 없고 읽었는지만 확인한다.
+
+  steps:
+    - no: 1
+      action: 상단 [전자결재]를 클릭한 뒤 [전자문서함]에서 [수신/회람]을 클릭합니다.
+      target: nav:전자결재 > 전자문서함 > 수신/회람
+      image: eapp-circular-01.png
+      note: null
+    - no: 2
+      action: 이후 절차는 공통 문서를 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []   # 확인필요: 이 화면만의 주의사항
+
+  faq: []
+
+---
+
+- screen_id: eapp-trash
+  screen_name: 휴지통
+  path: 전자결재 > 전자문서함 > 휴지통
+  pattern: A
+  inherits: pattern-eapproval
+  permission: 전자결재
+  draft: true                       # 화면 확인 전 뼈대
+  purpose: 지운 문서를 임시로 보관한다
+  key_concept: >
+    지운 문서가 잠시 머무는 곳이다. 잘못 지웠으면 여기서 되살린다.
+    완전히 지우려면 휴지통에서 영구 삭제한다. 영구 삭제한 문서는 되살릴 수 없다.
+
+  steps:
+    - no: 1
+      action: 상단 [전자결재]를 클릭한 뒤 [전자문서함]에서 [휴지통]을 클릭합니다.
+      target: nav:전자결재 > 전자문서함 > 휴지통
+      image: eapp-trash-01.png
+      note: null
+    - no: 2
+      action: 이후 절차는 공통 문서를 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []   # 확인필요: 이 화면만의 주의사항
+
+  faq: []
+
+---
+
+- screen_id: eapp-line
+  screen_name: 결재라인 관리
+  path: 전자결재 > 관리설정 > 결재라인 관리
+  pattern: E
+  inherits: pattern-eapproval
+  permission: 전자결재
+  purpose: 문서가 누구를 거쳐 결재될지 미리 정해 둔다
+
+  key_concept: >
+    문서를 올리기 전에 결재선이 있어야 한다.
+    자주 쓰는 경로를 이름 붙여 만들어 두고, 문서를 올릴 때 그 결재선을 고른다.
+    **결재선 하나에 세 가지를 지정한다.** 결재자, 회람, 수신이다.
+
+  three_roles:
+    - name: 결재자
+      desc: 순서대로 승인해야 하는 사람입니다. 이 사람들이 결재를 마쳐야 문서가 완료됩니다.
+    - name: 회람
+      desc: 승인은 필요 없고 내용만 알려 줄 사람입니다.
+    - name: 수신
+      desc: 문서를 받아 볼 사람입니다.   # 확인필요: 회람과의 정확한 차이
+
+  screen_specific:
+    - name: 결재선 추가
+      desc: 오른쪽 위 버튼으로 새 결재선을 만듭니다.
+    - name: 결재선 이름
+      desc: >
+        각 결재선에 이름을 붙입니다. "대표 결재"처럼 용도를 알아볼 수 있게 짓습니다.
+    - name: 수정 / 삭제
+      desc: 결재선마다 오른쪽 위에 수정과 삭제 버튼이 있습니다.
+
+  steps:
+    - no: 1
+      action: 상단 [전자결재]를 클릭한 뒤 왼쪽 [관리설정]에서 [결재라인 관리]를 클릭합니다.
+      target: nav:전자결재 > side:관리설정 > 결재라인 관리
+      image: eapp-line-01.png
+      note: null
+    - no: 2
+      action: 오른쪽 위 [결재선 추가]를 클릭해 새 결재선을 만듭니다.
+      target: null
+      image: null
+      note: null
+    - no: 3
+      action: 결재자를 순서대로 지정하고, 필요하면 회람과 수신도 넣습니다.
+      target: null
+      image: null
+      note: 결재자는 순서가 중요합니다. 앞사람이 승인해야 다음으로 넘어갑니다.
+    - no: 4
+      action: 만든 결재선은 [수정]으로 고치고, 필요 없으면 [삭제]합니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    - "결재선이 없으면 문서를 올릴 수 없습니다. 전자결재를 처음 쓸 때 여기부터 만드세요."
+    - "결재자 순서가 곧 결재 순서입니다. 순서를 잘못 넣으면 엉뚱한 사람에게 먼저 갑니다."
+    - "결재선을 바꿔도 이미 진행 중인 문서에는 반영되지 않을 수 있습니다."   # 확인필요
+
+  faq:
+    - q: 결재선을 여러 개 만들 수 있나요?
+      a: >
+        네. 용도별로 만들어 두고 문서를 올릴 때 고르면 됩니다.
+        예를 들어 소액 지출용과 고액 지출용을 따로 만들 수 있습니다.
+    - q: 회람과 수신은 뭐가 다른가요?
+      a: null   # 확인필요
+    - q: 결재자를 중간에 바꾸고 싶습니다.
+      a: 결재선을 [수정]하면 다음에 올리는 문서부터 적용됩니다.
+
+---
+
+- screen_id: eapp-form
+  screen_name: 문서양식 관리
+  path: 전자결재 > 관리설정 > 문서양식 관리
+  pattern: E
+  inherits: pattern-eapproval
+  permission: 전자결재
+  draft: true                       # 화면 확인 전 뼈대
+  purpose: 자주 쓰는 문서의 서식을 만들어 둔다
+  key_concept: >
+    자주 쓰는 문서를 서식으로 만들어 두면 매번 처음부터 쓰지 않아도 된다.
+    지출결의서, 휴가신청서처럼 형식이 정해진 문서에 쓴다.
+
+  steps:
+    - no: 1
+      action: 상단 [전자결재]를 클릭한 뒤 [관리설정]에서 [문서양식 관리]을 클릭합니다.
+      target: nav:전자결재 > 관리설정 > 문서양식 관리
+      image: eapp-form-01.png
+      note: null
+    - no: 2
+      action: 이후 절차는 공통 문서를 따릅니다.
+      target: null
+      image: null
+      note: null
+
+  cautions:
+    []   # 확인필요: 이 화면만의 주의사항
+
+  faq: []
+
