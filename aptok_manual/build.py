@@ -95,7 +95,12 @@ def chips(text):
         kind = "chip act" if label in ACTION_WORDS else "chip"
         return f'<b class="{kind}">{label}</b>'
 
-    return re.sub(r"\[([^\]]{1,20})\]", repl, esc)
+    return bold(re.sub(r"\[([^\]]{1,20})\]", repl, esc))
+
+
+def bold(fragment):
+    """**굵게** 표기를 <strong> 으로 바꾼다. chips() 뒤에 적용한다."""
+    return re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", fragment, flags=re.S)
 
 
 def block(text):
@@ -209,8 +214,8 @@ def screen_html(sc, commons):
     h.append(f'<div class="meta">{"".join(meta)}</div>')
 
     if sc.get("draft"):
-        h.append('<div class="draft">이 화면은 아직 뼈대입니다. '
-                 '화면 확인 후 내용을 채워야 합니다.</div>')
+        h.append('<div class="draft">이 화면은 메뉴 위치와 기본 조작만 안내합니다. '
+                 '자세한 설명은 준비 중입니다.</div>')
 
     if sc.get("purpose"):
         h.append(f'<div class="lede">{block(sc["purpose"])}</div>')
@@ -273,6 +278,27 @@ SECTION_LABELS = {
     "cycle": "주기", "order": "순서", "money_flow": "돈의 흐름",
     "where_numbers_come_from": "숫자가 이상할 때", "how_to_submit": "제출 방법",
     "deadline": "기한", "deadline_example": "예시", "why_first": "먼저 읽어야 하는 이유",
+    # 통화매니저 안내
+    "four_layers": "화면 네 단계", "layer1_popup": "알림창 상태",
+    "layer2_recent": "최근 기록 목록", "layer2_buttons": "목록의 버튼 세 개",
+    "layer3_conversation": "대화 화면", "layer4_detail": "통화 상세 화면",
+    "register_as_complaint": "민원으로 등록하기",
+    # 일일일지·일일보고
+    "where_it_works": "어디에서 쓰나", "how_to": "하는 방법",
+    "in_the_write_screen": "작성 화면에서 할 수 있는 것",
+    "list_screen": "목록 화면", "write_screen": "작성 화면",
+    "auto_calc": "자동으로 계산되는 값",
+    "report_types": "기안유형", "faster_way": "더 빠른 방법",
+    # 민원관리·설정
+    "detail_screen": "상세 화면", "line_status": "회선 상태",
+    "four_tabs": "설정 탭 네 개", "tab_call": "통화설정 탭", "tab_ars": "ARS 관리 탭",
+    "tab_thanks": "땡큐문자 탭", "tab_screenpop": "화면팝 탭",
+    # 설문·통계
+    "top_fields": "위쪽 입력 항목", "question_builder": "질문 만들기",
+    "buttons": "화면 아래 버튼", "not_ready": "준비 중인 기능",
+    "top_summary": "위쪽 요약",
+    # 안내
+    "same_as": "같은 화면 안내", "moved_notice": "메뉴 이동 안내",
 }
 SKIP_KEYS = {"doc_id", "doc_name", "applies_to_pattern", "applies_count", "purpose",
              "layout", "common_actions", "common_cautions", "common_faq",
@@ -472,7 +498,7 @@ ul.cols li{font-family:var(--mono);font-size:12px;padding:3px 9px;background:var
 .callout.pre{border-left-color:var(--accent)}
 .callout h4{font-size:12.5px;letter-spacing:.02em;margin-bottom:6px}
 .callout p{font-size:14.5px}
-.draft{background:#FFF4E6;border:1px dashed #E8A33D;color:#8A5A0B;
+.draft{background:#F4F5F6;border:1px solid #DFE3E6;color:#5B6770;
   font-size:13.5px;padding:10px 14px;border-radius:5px;margin:16px 0}
 .xref{font-size:14px;background:var(--surface);padding:13px 16px;border-radius:5px;margin:22px 0}
 .xref a{color:var(--accent);font-weight:600}

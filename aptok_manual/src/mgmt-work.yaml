@@ -385,8 +385,6 @@
 
   faq: []
 
-  privacy_note: 캡처 시 이름·동호수·연락처를 가린다.
-
 ---
 
 - screen_id: mgmt-security
