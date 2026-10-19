@@ -740,6 +740,34 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-of
 .legal-notice p{font-size:12.5px;line-height:1.75;color:#4A5663;word-break:keep-all}
 .legal-copy{margin-top:12px;font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.04em}
 .nav-legal{margin-top:24px;padding-top:14px;border-top:1px dashed var(--line);font-size:11px;color:var(--muted);line-height:1.5}
+
+/* 상단 이동 인터랙션 (2026-10-19) */
+.brand-link{display:block;text-decoration:none;color:inherit;padding:4px 8px;margin:-4px -8px 0;border-radius:6px;transition:background .15s ease}
+.brand-link:hover{background:var(--surface)}
+.brand-link:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.brand-link:active{transform:scale(.99)}
+
+.btn-top{
+  position:fixed;right:30px;bottom:30px;z-index:900;
+  display:inline-flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;width:52px;height:52px;border-radius:14px;
+  background:#fff;color:var(--ink);
+  border:1px solid var(--line);box-shadow:0 4px 18px rgba(20,32,44,.12);
+  cursor:pointer;opacity:0;visibility:hidden;transform:translateY(14px);
+  transition:opacity .25s ease,transform .25s ease,visibility .25s,background .15s,box-shadow .15s,border-color .15s,color .15s;
+}
+.btn-top.on{opacity:1;visibility:visible;transform:translateY(0)}
+.btn-top:hover{
+  background:#14202C;color:#fff;border-color:#14202C;
+  box-shadow:0 6px 22px rgba(20,32,44,.28);transform:translateY(-2px);
+}
+.btn-top:active{transform:translateY(0)}
+.btn-top span{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.06em;line-height:1}
+.btn-top svg{transition:transform .15s ease}
+.btn-top:hover svg{transform:translateY(-1px)}
+@media (max-width:860px){
+  .btn-top{right:16px;bottom:16px;width:46px;height:46px;border-radius:12px}
+}
 """
 
 JS = """
@@ -978,6 +1006,34 @@ addEventListener('keydown',e=>{
     const d = e.changedTouches[0].clientX - sx; if (Math.abs(d) > 70) show(i + (d < 0 ? 1 : -1)); }, {passive: true});
   window.addEventListener('resize', () => { if (lb.classList.contains('on')) fit(); });
 })();
+
+// 최상단 이동 인터랙션 (좌측 로고 및 우측 하단 플로팅 버튼) (2026-10-19)
+(() => {
+  const toTop = e => {
+    if (e) e.preventDefault();
+    window.scrollTo({top: 0, behavior: 'smooth'});
+    const nav = document.querySelector('.nav');
+    if (nav) nav.scrollTo({top: 0, behavior: 'smooth'});
+    if (history.replaceState) history.replaceState(null, '', location.pathname + location.search);
+  };
+  const brand = document.getElementById('brand-link');
+  if (brand) brand.addEventListener('click', toTop);
+
+  const btnTop = document.getElementById('btn-top');
+  if (btnTop) {
+    btnTop.addEventListener('click', toTop);
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          btnTop.classList.toggle('on', window.scrollY > 300);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    }, {passive: true});
+  }
+})();
 """
 
 
@@ -1010,8 +1066,9 @@ def build_site(commons, screens, out):
             return parts[1]
         return None
 
-    nav = [f'<div class="brand">{html.escape(TITLE)}</div>'
-           f'<div class="brand-sub">{html.escape(SUBTITLE)}</div>',
+    nav = [f'<a href="#" id="brand-link" class="brand-link" title="최상단으로 이동" aria-label="최상단으로 이동">'
+           f'<div class="brand">{html.escape(TITLE)}</div>'
+           f'<div class="brand-sub">{html.escape(SUBTITLE)}</div></a>',
            '<div class="search">'
            '<input id="q" type="search" autocomplete="off" placeholder="검색 (Ctrl+K)" '
            'aria-label="매뉴얼 검색">'
@@ -1131,6 +1188,10 @@ def build_site(commons, screens, out):
   </div>
 </footer>
 </main></div>
+<button id="btn-top" class="btn-top" type="button" aria-label="맨 위로 이동" title="맨 위로 이동">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+  <span>TOP</span>
+</button>
 <script id="idx" type="application/json">{index_json}</script>
 <script>{JS}</script></body></html>"""
 
