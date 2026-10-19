@@ -732,6 +732,14 @@ a:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-of
   .masthead h1{font-size:27px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* 법적 보호 및 저작권 안내 (2026-10-19) */
+.legal-footer{margin-top:70px;padding-top:28px;border-top:1px solid var(--line)}
+.legal-notice{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:8px;padding:20px 24px}
+.legal-notice h4{font-size:13.5px;font-weight:700;color:var(--accent);letter-spacing:-.01em;margin-bottom:8px}
+.legal-notice p{font-size:12.5px;line-height:1.75;color:#4A5663;word-break:keep-all}
+.legal-copy{margin-top:12px;font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.04em}
+.nav-legal{margin-top:24px;padding-top:14px;border-top:1px dashed var(--line);font-size:11px;color:var(--muted);line-height:1.5}
 """
 
 JS = """
@@ -1072,6 +1080,7 @@ def build_site(commons, screens, out):
         nav.append("</div></details>")
 
     nav.append("</div>")   # #tree 닫기
+    nav.append('<div class="nav-legal"><b>(주)디엑스플랫폼</b><br>지식재산권 보호 · 무단복제 및 AI 학습 금지</div>')
 
     # 본문도 목차와 같은 순서로 낸다.
     screens = [sc for items in groups.values() for sc in items]
@@ -1095,6 +1104,8 @@ def build_site(commons, screens, out):
 
     doc = f"""<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+<meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet">
 <title>{html.escape(TITLE)}</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@500;700&family=IBM+Plex+Sans+KR:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -1112,6 +1123,13 @@ def build_site(commons, screens, out):
 <span>점선 칸은 화면 캡처가 들어갈 자리</span>
 </div>
 {"".join(body)}
+<footer class="legal-footer">
+  <div class="legal-notice">
+    <h4>지식재산권 및 무단 복제·도용 금지 고지</h4>
+    <p>본 매뉴얼에 수록된 UI/UX 구성, 화면 명세, 업무 흐름도, 툴팁 설명 등 모든 콘텐츠의 지식재산권은 (주)디엑스플랫폼에 있습니다. 본 콘텐츠를 무단 복제, 배포, 크롤링하거나 인공지능(AI) 학습 데이터 및 유사 서비스 기획·개발의 목적으로 무단 사용하는 행위는 「저작권법」 및 「부정경쟁방지 및 영업비밀보호에 관한 법률(부경법 제2조 제1호 카목)」에 따라 민·형사상 법적 책임을 질 수 있습니다.</p>
+    <div class="legal-copy">Copyright &copy; DX PLATFORM Inc. All Rights Reserved.</div>
+  </div>
+</footer>
 </main></div>
 <script id="idx" type="application/json">{index_json}</script>
 <script>{JS}</script></body></html>"""

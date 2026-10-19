@@ -29,6 +29,8 @@ aptok_manual/_backup*
 aptok_manual/_review/
 aptok_manual/testdata/
 aptok_manual/*.txt
+!aptok_manual/robots.txt
+!robots.txt
 aptok_manual/*.ps1
 aptok_manual/*작업계획*
 aptok_manual/captures/_login_failed.png
