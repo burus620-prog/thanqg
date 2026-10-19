@@ -23,6 +23,7 @@ IMG_BASE = "../captures"
 # 제목은 site.yaml 이 있으면 거기서, 없으면 기본값
 TITLE, SUBTITLE = "사용자 매뉴얼", ""
 MENU_ORDER = []      # site.yaml 의 menu_order 로 목차 순서를 정한다
+ON_HOLD = {}         # site.yaml 의 on_hold: 그림·절차를 잠시 내리고 안내만 보일 화면 {screen_id: 안내문}
 MENU_OPEN = []       # 처음부터 펼쳐 둘 대분류
 SCREEN_ORDER = {}    # 대분류 안에서의 화면 순서 {대분류: [screen_id, ...]}
 _cfg = os.path.join(BASE, "site.yaml")
@@ -32,6 +33,7 @@ if os.path.exists(_cfg):
     TITLE = _c.get("title", TITLE)
     SUBTITLE = _c.get("subtitle", SUBTITLE)
     MENU_ORDER = [str(x) for x in _c.get("menu_order", [])]
+    ON_HOLD = {str(k): str(v) for k, v in (_c.get("on_hold") or {}).items()}
     MENU_OPEN = [str(x) for x in (_c.get("menu_open") or [])]
     SCREEN_ORDER = {str(k): [str(v) for v in (vs or [])]
                     for k, vs in (_c.get("screen_order") or {}).items()}
@@ -103,8 +105,50 @@ def bold(fragment):
     return re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", fragment, flags=re.S)
 
 
+_STEP = tuple("①②③④⑤⑥⑦⑧⑨")
+
+
 def block(text):
-    return "".join(f"<p>{chips(p)}</p>" for p in str(text).strip().split("\n") if p.strip())
+    """글 묶음을 문단으로. 「· 」로 시작하는 줄이 있으면 목록으로 그린다 (2026-10-19).
+    목록이 있는 글: 이어지는 보통 줄은 한 문단, 「· 」 줄은 목록 항목, 그 아래 더 들여 쓴 줄은 항목에 이어 붙는다,
+    ①~⑨ 로 시작하는 줄은 따로 한 문단."""
+    raw = str(text).strip()
+    lines = raw.split("\n")
+    if not any(l.lstrip().startswith("· ") for l in lines):
+        return "".join(f"<p>{chips(p)}</p>" for p in lines if p.strip())
+    out, para, items = [], [], []
+
+    def flush_p():
+        if para:
+            out.append(f"<p>{chips(' '.join(para))}</p>")
+            para.clear()
+
+    def flush_ul():
+        if items:
+            out.append('<ul class="dots">' + "".join(f"<li>{chips(i)}</li>" for i in items) + "</ul>")
+            items.clear()
+
+    prev_bullet_ind = None
+    for l in lines:
+        t = l.strip()
+        ind = len(l) - len(l.lstrip())
+        if not t:
+            flush_p(); flush_ul(); prev_bullet_ind = None
+            continue
+        if t.startswith("· "):
+            flush_p()
+            items.append(t[2:])
+            prev_bullet_ind = ind
+        elif items and prev_bullet_ind is not None and ind > prev_bullet_ind:
+            items[-1] += " " + t
+        elif t.startswith(_STEP):
+            flush_p(); flush_ul(); prev_bullet_ind = None
+            out.append(f"<p>{chips(t)}</p>")
+        else:
+            flush_ul(); prev_bullet_ind = None
+            para.append(t)
+    flush_p(); flush_ul()
+    return "".join(out)
 
 
 def anchor(sid):
@@ -127,10 +171,18 @@ def find_captures():
     하위 폴더로 나뉘어 있든 한 폴더에 몰려 있든 상관없이 동작한다."""
     idx = {}
     root = os.path.join(BASE, "captures")
+    webp = {}
     for dirpath, _dirs, files in os.walk(root):
         for f in files:
-            if f.lower().endswith(".png"):
+            low = f.lower()
+            if "_확인필요" in f:
+                continue
+            if low.endswith(".png"):
                 idx.setdefault(f, os.path.join(dirpath, f))
+            elif low.endswith(".webp"):
+                # 2026-10-18 부터 캡처는 2배 해상도 WebP 로 저장된다. 이름은 원본의 .png 로 찾는다
+                webp.setdefault(f[:-5] + ".png", os.path.join(dirpath, f))
+    idx.update(webp)      # 같은 이름이면 새 WebP 가 이긴다
     return idx
 
 
@@ -138,6 +190,26 @@ CAPTURES = {}       # build_site 에서 채운다
 OUT_DIR = BASE      # 생성될 html 이 놓이는 폴더
 EMBEDDED = []       # 실제로 붙은 이미지
 MISSING = []        # 못 찾은 이미지
+
+
+def figure_html(name, caption):
+    """공통 문서용 그림 한 장. 화면 단계 그림과 같은 확대 보기를 쓴다."""
+    path = CAPTURES.get(name)
+    if not path:
+        MISSING.append(name)
+        return ""
+    rel = os.path.relpath(path, OUT_DIR).replace("\\", "/")
+    EMBEDDED.append(name)
+    cap = re.sub(r"\[([^\]]{1,20})\]", r"「\1」", str(caption or "")).strip()
+    return (f'<figure class="shot has-img common-shot" tabindex="0" role="button" aria-label="화면 크게 보기">'
+            f'<img src="{html.escape(rel)}" alt="{html.escape(cap)}" loading="lazy" data-cap="{html.escape(cap)}">'
+            f'<span class="zoom-hint">⤢ 크게 보기</span></figure>'
+            + (f'<p class="shot-cap">{chips(caption)}</p>' if caption else ''))
+
+
+def shots_after(item, key):
+    return "".join(figure_html(s["image"], s.get("caption")) for s in (item.get("shots") or [])
+                   if s.get("after", "purpose") == key)
 
 
 def steps_html(steps, title=None, screen_id=""):
@@ -154,8 +226,14 @@ def steps_html(steps, title=None, screen_id=""):
             if path:
                 rel = os.path.relpath(path, OUT_DIR).replace("\\", "/")
                 EMBEDDED.append(name)
-                out.append(f'<figure class="shot has-img">'
-                           f'<img src="{html.escape(rel)}" alt="{html.escape(name)}" loading="lazy">'
+                cap = re.sub(r"\*\*(.+?)\*\*", r"\1",
+                             re.sub(r"\[([^\]]{1,20})\]", r"「\1」", str(s["action"]))).strip()
+                no = s.get("no", "")
+                out.append(f'<figure class="shot has-img" tabindex="0" role="button" '
+                           f'aria-label="화면 크게 보기">'
+                           f'<img src="{html.escape(rel)}" alt="{html.escape(cap)}" loading="lazy" '
+                           f'data-cap="{html.escape(((str(no) + ". ") if no != "" else "") + cap)}">'
+                           f'<span class="zoom-hint">⤢ 크게 보기</span>'
                            f'</figure>')
             else:
                 MISSING.append(name)
@@ -198,10 +276,43 @@ def fields_html(fields):
 
 # ---------------------------------------------------------------- 화면
 
+# 왼쪽 메뉴 아이콘 — 선으로 그린 SVG (2026-10-19 메뉴 구분 개편)
+def _svg(d, size=16):
+    return (f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" '
+            f'stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{d}</svg>')
+
+
+ICON_BOOK = _svg('<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/>', 18)
+ICON_DOC = _svg('<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5"/>', 14)
+ICON_DEFAULT = _svg('<rect x="4" y="4" width="16" height="16" rx="3"/>')
+TOP_ICONS = {
+    "민원관리": _svg('<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>'),
+    "관리업무": _svg('<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9z"/>'),
+    "법정일정": _svg('<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>'),
+    "전자결재": _svg('<path d="M6 3h9l4 4v14H6z"/><path d="M9 14l2 2 4-4"/>'),
+    "자산관리": _svg('<path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/>'),
+    "입주자관리": _svg('<path d="M4 10l8-6 8 6v10H4z"/><path d="M10 20v-6h4v6"/>'),
+    "인사관리": _svg('<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 5.5a3 3 0 0 1 0 5.6M18 14.5c1.8.8 3 2.7 3 5"/>'),
+    "입찰계약": _svg('<path d="M6 3h9l4 4v14H6z"/><path d="M9 12h6M9 16h4"/>'),
+    "장기수선계획": _svg('<path d="M14.7 6.3a4 4 0 0 0-5.4 5.2L4 16.8V20h3.2l5.3-5.3a4 4 0 0 0 5.2-5.4l-2.4 2.4-2.6-.4-.4-2.6z"/>'),
+    "이용요금·결제": _svg('<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h4"/>'),
+}
+
+
+def crumbs(path):
+    """경로 표시 — 왼쪽 메뉴와 같은 굵기 규칙: 1차 가장 굵게, 마지막(지금 화면)은 강조색."""
+    parts = [p.strip() for p in str(path).split(">") if p.strip()]
+    out = []
+    for i, p in enumerate(parts):
+        cls = "c1" if i == 0 else ("cl" if i == len(parts) - 1 else "c2")
+        out.append(f'<span class="{cls}">{chips(p)}</span>')
+    return '<span class="sep">›</span>'.join(out)
+
+
 def screen_html(sc, commons):
     a = anchor(sc["screen_id"])
     h = [f'<section id="{a}" class="screen">']
-    h.append(f'<p class="path">{chips(sc.get("path", ""))}</p>')
+    h.append(f'<p class="path">{crumbs(sc.get("path", ""))}</p>')
     h.append(f'<h2>{html.escape(sc["screen_name"])}</h2>')
 
     meta = []
@@ -219,6 +330,11 @@ def screen_html(sc, commons):
 
     if sc.get("purpose"):
         h.append(f'<div class="lede">{block(sc["purpose"])}</div>')
+
+    if sc["screen_id"] in ON_HOLD:
+        h.append(f'<div class="draft">{block(ON_HOLD[sc["screen_id"]])}</div>')
+        h.append("</section>")
+        return "".join(h)
 
     if sc.get("why_first"):
         h.append(f'<div class="callout"><h4>먼저 읽어야 하는 이유</h4>{block(sc["why_first"])}</div>')
@@ -279,10 +395,11 @@ SECTION_LABELS = {
     "where_numbers_come_from": "숫자가 이상할 때", "how_to_submit": "제출 방법",
     "deadline": "기한", "deadline_example": "예시", "why_first": "먼저 읽어야 하는 이유",
     # 통화매니저 안내
-    "four_layers": "화면 네 단계", "layer1_popup": "알림창 상태",
-    "layer2_recent": "최근 기록 목록", "layer2_buttons": "목록의 버튼 세 개",
-    "layer3_conversation": "대화 화면", "layer4_detail": "통화 상세 화면",
-    "register_as_complaint": "민원으로 등록하기",
+    "four_layers": "화면 네 단계", "quick_flow": "클릭 세 번 — 전체 흐름", "layer1_popup": "① 알림창",
+    "layer2_recent": "② 최근 기록 — 단지 전체 통화·문자", "layer2_buttons": "목록의 버튼 세 개",
+    "layer3_conversation": "③ 대화 화면 — 한 사람과의 기록", "layer4_detail": "④ 통화 상세 화면",
+    "register_as_complaint": "⑤ 민원으로 등록하기",
+    "register_number": "모르는 번호 등록하기", "reply_channel": "문자 답장 채널",
     # 일일일지·일일보고
     "where_it_works": "어디에서 쓰나", "how_to": "하는 방법",
     "in_the_write_screen": "작성 화면에서 할 수 있는 것",
@@ -297,6 +414,14 @@ SECTION_LABELS = {
     "top_fields": "위쪽 입력 항목", "question_builder": "질문 만들기",
     "buttons": "화면 아래 버튼", "not_ready": "준비 중인 기능",
     "top_summary": "위쪽 요약",
+    # 장기수선계획 (2026-10)
+    "screens": "화면 구성", "regular_vs_adhoc": "정기조정과 수시조정", "three_values": "값의 세 단계",
+    "main_buttons": "위쪽 버튼 네 개", "progress_bar": "조정안 작성 진행표", "sections": "화면 구성",
+    "four_kinds": "예외지출 네 가지", "review_panel": "검토창", "close_flow": "마감",
+    "legal_refs": "근거 법령", "match_groups": "항목 확인 화면의 다섯 묶음", "errors_and_fixes": "막힐 때",
+    # 2026-10 업데이트
+    "cost": "비용", "how_to_open": "들어가는 방법", "tabs": "탭 구성",
+    "channels": "채널 세 가지", "how_to_choose": "어느 채널로 보낼까",
     # 안내
     "same_as": "같은 화면 안내", "moved_notice": "메뉴 이동 안내",
 }
@@ -305,7 +430,7 @@ SKIP_KEYS = {"doc_id", "doc_name", "applies_to_pattern", "applies_count", "purpo
              "screen_id", "screen_name", "path", "pattern", "inherits", "permission",
              "draft", "steps", "sub_flows", "cautions", "faq", "columns", "fields",
              "concepts", "screen_specific", "observed_state", "privacy_note",
-             "prerequisite", "legal_basis", "sources"}
+             "prerequisite", "legal_basis", "sources", "shots"}
 
 
 def extra_sections(item):
@@ -315,6 +440,7 @@ def extra_sections(item):
         if key in SKIP_KEYS or not val:
             continue
         label = SECTION_LABELS.get(key, key.replace("_", " "))
+        _after = shots_after(item, key)
         if isinstance(val, str):
             out.append(f'<div class="callout"><h4>{html.escape(label)}</h4>'
                        f'{block(val)}</div>')
@@ -331,23 +457,26 @@ def extra_sections(item):
                     rows += f'<tr><td colspan="2">{chips(v)}</td></tr>'
             out.append(f'<h4 class="sub">{html.escape(label)}</h4>'
                        f'<table class="fields"><tbody>{rows}</tbody></table>')
+        out.append(_after)
     return "".join(out)
 
 
 def common_html(c):
     h = [f'<section id="{anchor(c["doc_id"])}" class="screen">']
-    h.append('<p class="path">공통 문서</p>')
+    h.append('<p class="path"><span class="c1 guide-c">공통 안내</span></p>')
     h.append(f'<h2>{html.escape(c["doc_name"])}</h2>')
     n = c.get("applies_count")
     h.append('<div class="meta"><span class="tag">'
              + (f"{n}개 화면 공통" if n else "공통 문서") + '</span></div>')
     h.append(f'<div class="lede">{block(c["purpose"])}</div>')
+    h.append(shots_after(c, "purpose"))
     h.append(extra_sections(c))
 
     if c.get("layout"):
         rows = "".join(f'<tr><th>{html.escape(z["zone"])}</th><td>{chips(z["desc"])}</td></tr>'
                        for z in c["layout"])
         h.append(f'<h4 class="sub">화면 구성</h4><table class="fields"><tbody>{rows}</tbody></table>')
+        h.append(shots_after(c, "layout"))
 
     for act in c.get("common_actions", []):
         h.append(f'<div class="action"><h4>{chips(act["name"])}</h4><ol class="plain">')
@@ -357,6 +486,7 @@ def common_html(c):
             h.append(f'<p class="note">{chips(act["note"])}</p>')
         if act.get("caution"):
             h.append(f'<div class="warn tight"><ul><li>{chips(act["caution"])}</li></ul></div>')
+        h.append(shots_after(c, act["name"]))
         h.append("</div>")
 
     h.append(cautions_html(c.get("common_cautions")))
@@ -379,13 +509,20 @@ CSS = """
 }
 body{font-family:var(--sans);color:var(--ink);background:var(--surface);
   font-size:15px;line-height:1.75;-webkit-font-smoothing:antialiased}
-.wrap{display:grid;grid-template-columns:264px minmax(0,1fr);gap:0;
-  max-width:1180px;margin:0 auto;background:var(--paper);min-height:100vh}
+.wrap{display:grid;grid-template-columns:296px minmax(0,1fr);gap:0;
+  max-width:1212px;margin:0 auto;background:var(--paper);min-height:100vh}
 
 /* 좌측 목차 — 제품의 왼쪽 메뉴와 같은 자리 */
-.nav{border-right:1px solid var(--line);padding:34px 22px 60px;
-  position:sticky;top:0;height:100vh;overflow-y:auto;background:var(--paper)}
-.brand{font-family:var(--disp);font-size:21px;font-weight:700;letter-spacing:-.02em;
+.nav{border-right:1px solid var(--line);padding:34px 14px 60px 22px;
+  position:sticky;top:0;height:100vh;overflow-y:auto;background:var(--paper);
+  scrollbar-width:thin;scrollbar-color:transparent transparent;scrollbar-gutter:stable}
+/* 메뉴 스크롤바 — 얇게, 마우스를 올렸을 때만 보인다 (2026-10-19) */
+.nav:hover{scrollbar-color:#C9D1D9 transparent}
+.nav::-webkit-scrollbar{width:6px}
+.nav::-webkit-scrollbar-track{background:transparent}
+.nav::-webkit-scrollbar-thumb{background:transparent;border-radius:3px}
+.nav:hover::-webkit-scrollbar-thumb{background:#C9D1D9}
+.brand{font-family:var(--disp);font-size:19px;font-weight:700;letter-spacing:-.02em;white-space:nowrap;
   line-height:1.3;margin-bottom:4px}
 .brand em{font-style:normal;color:var(--accent)}
 .brand-sub{font-size:12px;color:var(--muted);margin-bottom:26px;letter-spacing:.02em}
@@ -419,21 +556,60 @@ body{font-family:var(--sans);color:var(--ink);background:var(--surface);
 .results mark{background:#FFF0B3;color:inherit;border-radius:2px;padding:0 1px}
 .results .none{font-size:13px;color:var(--muted);padding:14px 0;line-height:1.7}
 
-/* 대분류 — 눌러서 접고 편다 */
+/* ── 왼쪽 메뉴 (2026-10-19 개편) ─────────────────────────────
+   공통 안내 = 메뉴 밖 파란 카드 · 1차 = 아이콘+굵게+구분선 · 2차 = 한 가지 모양
+   3차 = 세로 안내선 안쪽 · 지금 화면 = 강조색 + 왼쪽 막대 + 옅은 배경, 부모는 굵게 */
+.guide{background:#F1F6FC;border:1px solid #D3E1F1;border-radius:10px;padding:10px 10px 6px;margin:0 0 18px}
+.guide-h{display:flex;align-items:center;gap:7px;white-space:nowrap;padding:2px 2px 7px;color:#1F4577;font-size:13.5px;font-weight:600}
+.guide-h em{margin-left:auto;font-style:normal;font-size:10.5px;font-weight:600;background:#DCE8F6;
+  border-radius:999px;padding:1px 8px;color:#1F4577}
+.nav .guide a.g{display:flex;align-items:flex-start;gap:7px;margin:0;padding:6px 6px;border-radius:6px;
+  font-size:13px;color:#2A3442;line-height:1.45}
+.nav .guide a.g svg{flex-shrink:0;margin-top:3px;color:#6E85A3}
+.nav .guide a.g span{min-width:0}
+.nav .guide a.g:hover{background:#fff}
+.nav .guide a.g.on{background:#fff;color:#1F4577;font-weight:600}
+.nav .guide a.g.on svg{color:#2C5A96}
+.nav-label{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:600;color:var(--muted);
+  letter-spacing:.06em;margin:4px 0 4px}
+.nav-label::after{content:"";flex:1;height:1px;background:var(--line)}
+
 .grp{border-bottom:1px solid var(--line)}
-.grp>summary{list-style:none;cursor:pointer;padding:11px 22px 11px 0;position:relative;
-  font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--muted);
-  text-transform:uppercase;user-select:none}
+.grp>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:9px;
+  min-height:44px;padding:4px 22px 4px 0;position:relative;user-select:none;
+  font-size:14.5px;font-weight:700;color:var(--ink)}
 .grp>summary::-webkit-details-marker{display:none}
-.grp>summary:hover{color:var(--ink)}
-.grp[open]>summary{color:var(--ink);font-weight:500}
-.grp>summary::after{content:"+";position:absolute;right:2px;top:9px;
-  font-family:var(--mono);font-size:13px;color:var(--muted)}
-.grp[open]>summary::after{content:"−"}
-.grp-in{padding-bottom:10px}
-.nav .nav-sub{font-size:11.5px;color:var(--muted);margin:9px 0 3px;letter-spacing:.02em}
-.nav a.ind{padding-left:20px;margin-left:-10px}
-.nav a.ind::before{content:"·";color:var(--muted);margin-right:7px}
+.grp>summary .tn{min-width:0;line-height:1.35}
+.grp>summary .ico{width:26px;height:26px;border-radius:7px;background:var(--surface);color:#4A5866;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.grp[open]>summary .ico{background:#FDE8EC;color:var(--accent)}
+.grp>summary::after{content:"";position:absolute;right:4px;top:50%;width:7px;height:7px;margin-top:-6px;
+  border-right:1.6px solid var(--muted);border-bottom:1.6px solid var(--muted);transform:rotate(-45deg)}
+.grp[open]>summary::after{transform:rotate(45deg);margin-top:-7px;border-color:var(--ink)}
+.grp>summary:hover .tn{color:var(--accent)}
+.grp-in{padding:0 0 10px}
+.nav a.l2,.nav .l2{display:flex;align-items:center;margin:0;padding:6px 6px 6px 35px;border-radius:6px;
+  font-size:13.5px;font-weight:500;color:var(--ink)}
+.nav .l2.has::after{content:"";margin-left:auto;width:6px;height:6px;border-right:1.4px solid var(--muted);
+  border-bottom:1.4px solid var(--muted);transform:rotate(45deg);margin-top:-4px}
+.nav .l2.par{font-weight:700}
+.l3wrap{margin:0 0 4px 42px;border-left:1.5px solid var(--line)}
+.nav a.l3{display:block;margin:0;padding:5px 6px 5px 13px;border-radius:0 6px 6px 0;
+  font-size:13px;color:#4A5866}
+.nav a.l3:hover,.nav a.l2:hover{background:var(--surface)}
+.nav a.on{color:var(--accent);font-weight:600}
+.nav a.l3.on{border-left:3px solid var(--accent);margin-left:-1.5px;padding-left:11.5px;background:#FDECEF}
+.nav a.l2.on{background:#FDECEF;box-shadow:inset 3px 0 0 var(--accent)}
+.path{display:flex;align-items:center;flex-wrap:wrap;gap:6px}
+.path .sep{color:#A8B3BD}
+.path .c1{font-weight:600;color:var(--ink)}
+.path .c2{color:var(--ink)}
+.path .cl{color:var(--accent);font-weight:600}
+.path .guide-c{color:#1F4577}
+ul.dots{margin:6px 0 8px;padding-left:2px;list-style:none}
+ul.dots li{position:relative;padding-left:14px;margin:3px 0;line-height:1.75}
+ul.dots li::before{content:"";position:absolute;left:2px;top:.78em;width:5px;height:5px;border-radius:50%;
+  background:var(--muted)}
 
 .main{padding:52px 56px 120px;max-width:820px}
 .masthead{border-bottom:2px solid var(--ink);padding-bottom:22px;margin-bottom:14px}
@@ -444,7 +620,7 @@ body{font-family:var(--sans);color:var(--ink);background:var(--surface);
 
 .screen{padding:44px 0;border-top:1px solid var(--line)}
 .screen:first-of-type{border-top:0}
-.path{font-family:var(--mono);font-size:11.5px;color:var(--muted);letter-spacing:.02em;margin-bottom:6px}
+.path{font-size:12.5px;color:var(--muted);margin-bottom:6px}
 .screen h2{font-family:var(--disp);font-size:26px;font-weight:700;letter-spacing:-.02em;line-height:1.35}
 .meta{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0 20px}
 .tag{font-family:var(--mono);font-size:11px;padding:3px 9px;border:1px solid var(--line);
@@ -476,6 +652,32 @@ h4.sub{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transfor
 figure.shot{height:auto;border:1px solid var(--line);border-radius:6px;overflow:hidden;
   background:var(--paper);padding:0;display:block}
 figure.shot img{display:block;width:100%;height:auto}
+/* 클릭 확대 (2026-10-18) */
+figure.shot.has-img{position:relative;cursor:zoom-in}
+figure.shot.has-img:focus-visible{outline:3px solid var(--accent,#2563EB);outline-offset:2px}
+.zoom-hint{position:absolute;right:8px;bottom:8px;padding:4px 9px;border-radius:999px;
+  background:rgba(17,24,39,.72);color:#fff;font-size:12px;opacity:0;transition:opacity .15s;pointer-events:none}
+figure.shot.has-img:hover .zoom-hint,figure.shot.has-img:focus .zoom-hint{opacity:1}
+@media (hover:none){.zoom-hint{opacity:.85}}
+.lb{position:fixed;inset:0;z-index:9999;background:#0B0F15;display:none;
+  flex-direction:column;user-select:none;-webkit-user-select:none}
+.lb.on{display:flex}
+.lb-bar{display:flex;align-items:center;gap:8px;padding:10px 14px;color:#E5E7EB;font-size:13.5px;
+  background:#111827;border-bottom:1px solid #1F2937;position:relative;z-index:2}
+.lb-cap{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lb-cnt{font-family:var(--mono,monospace);color:#9CA3AF}
+.lb button{background:rgba(255,255,255,.1);color:#fff;border:0;border-radius:8px;
+  min-width:38px;height:38px;font-size:16px;cursor:pointer}
+.lb button:hover{background:rgba(255,255,255,.22)}
+.lb-stage{flex:1;position:relative;overflow:hidden;touch-action:none;cursor:grab}
+.lb-stage.drag{cursor:grabbing}
+.lb-stage img{position:absolute;left:0;top:0;transform-origin:0 0;max-width:none;
+  box-shadow:0 10px 40px rgba(0,0,0,.5);background:#fff}
+.lb-nav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:64px!important;font-size:24px!important}
+.lb-prev{left:10px}.lb-next{right:10px}
+.lb-help{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);color:#E5E7EB;
+  font-size:12px;background:rgba(17,24,39,.88);padding:5px 12px;border-radius:999px;pointer-events:none}
+@media (max-width:640px){.lb-help{display:none}.lb-nav{display:none}}
 
 .plain{padding-left:19px;font-size:14.5px}
 .plain li{margin-bottom:3px}
@@ -498,6 +700,8 @@ ul.cols li{font-family:var(--mono);font-size:12px;padding:3px 9px;background:var
 .callout.pre{border-left-color:var(--accent)}
 .callout h4{font-size:12.5px;letter-spacing:.02em;margin-bottom:6px}
 .callout p{font-size:14.5px}
+.common-shot{margin:14px 0 4px}
+.shot-cap{font-size:13px;color:#5B6770;margin:0 0 18px}
 .draft{background:#F4F5F6;border:1px solid #DFE3E6;color:#5B6770;
   font-size:13.5px;padding:10px 14px;border-radius:5px;margin:16px 0}
 .xref{font-size:14px;background:var(--surface);padding:13px 16px;border-radius:5px;margin:22px 0}
@@ -536,7 +740,11 @@ const links=[...document.querySelectorAll('.nav a')];
 /* 지금 보고 있는 화면을 목차에서 표시하고, 그 화면이 든 대분류는 펼쳐 준다. */
 function mark(a){
   links.forEach(l=>l.classList.toggle('on',l===a));
+  document.querySelectorAll('.nav .l2.par').forEach(e=>e.classList.remove('par'));
   if(!a) return;
+  const w=a.closest('.l3wrap');
+  if(w&&w.previousElementSibling&&w.previousElementSibling.classList.contains('l2'))
+    w.previousElementSibling.classList.add('par');
   const g=a.closest('details.grp');
   if(g&&!g.open) g.open=true;
 }
@@ -651,6 +859,117 @@ addEventListener('keydown',e=>{
     e.preventDefault(); qi.focus(); qi.select();
   }
 });
+
+/* ---- 화면 캡처 클릭 확대 (2026-10-18) ----
+   휠·핀치로 확대, 끌어서 이동, 두 번 클릭으로 맞춤↔원본, ←/→ 같은 화면의 이전·다음 캡처, Esc 닫기 */
+(function(){
+  const lb = document.createElement('div');
+  lb.className = 'lb'; lb.setAttribute('role','dialog'); lb.setAttribute('aria-modal','true');
+  lb.innerHTML =
+    '<div class="lb-bar"><span class="lb-cap"></span><span class="lb-cnt"></span>' +
+    '<button data-a="out" title="축소 (−)">−</button><button data-a="in" title="확대 (+)">+</button>' +
+    '<button data-a="fit" title="화면에 맞춤 (0)">맞춤</button><button data-a="one" title="원본 크기 (1)">1:1</button>' +
+    '<button data-a="new" title="새 창에서 열기">↗</button><button data-a="close" title="닫기 (Esc)">✕</button></div>' +
+    '<div class="lb-stage"><img alt=""><button class="lb-nav lb-prev" data-a="prev" title="이전 (←)">‹</button>' +
+    '<button class="lb-nav lb-next" data-a="next" title="다음 (→)">›</button>' +
+    '<span class="lb-help">휠·두 손가락으로 확대 · 끌어서 이동 · 두 번 클릭하면 원본 크기</span></div>';
+  document.body.appendChild(lb);
+  const stage = lb.querySelector('.lb-stage'), im = stage.querySelector('img');
+  const cap = lb.querySelector('.lb-cap'), cnt = lb.querySelector('.lb-cnt');
+  let list = [], i = 0, s = 1, x = 0, y = 0, fitS = 1, W = 0, H = 0, last = null;
+
+  const apply = () => { im.style.transform = `translate(${x}px,${y}px) scale(${s})`; };
+  const clamp = v => Math.min(Math.max(v, fitS * 0.5), 6);
+  const center = () => { const r = stage.getBoundingClientRect();
+    x = (r.width - W * s) / 2; y = Math.max(0, (r.height - H * s) / 2); apply(); };
+  const fit = () => { const r = stage.getBoundingClientRect();
+    // 가로는 화면에 맞추고, 아주 긴 화면은 위에서부터 보이게 한다
+    fitS = Math.min((r.width - 24) / W, 1.5);
+    if (H * fitS < r.height - 24) fitS = Math.min(fitS, (r.height - 24) / H);
+    s = fitS; center(); if (H * s > r.height) { y = 12; apply(); } };
+  const one = () => { s = 1 / (im.dataset.k || 1); center(); if (H * s > stage.clientHeight) { y = 12; apply(); } };
+  const zoomAt = (k, cx, cy) => { const r = stage.getBoundingClientRect();
+    cx = cx == null ? r.width / 2 : cx - r.left; cy = cy == null ? r.height / 2 : cy - r.top;
+    const ns = clamp(s * k); x = cx - (cx - x) * ns / s; y = cy - (cy - y) * ns / s; s = ns; apply(); };
+
+  const show = n => {
+    i = (n + list.length) % list.length;
+    const src = list[i].querySelector('img');
+    cap.textContent = src.dataset.cap || src.alt || '';
+    cnt.textContent = list.length > 1 ? (i + 1) + ' / ' + list.length : '';
+    lb.querySelectorAll('.lb-nav').forEach(b => b.style.visibility = list.length > 1 ? 'visible' : 'hidden');
+    im.onload = () => { W = im.naturalWidth; H = im.naturalHeight;
+      im.dataset.k = /\\.webp(\\?|$)/i.test(im.src) ? 2 : 1;   // 2배 캡처는 절반이 실제 화면 크기
+      im.style.width = W + 'px'; im.style.height = H + 'px'; fit(); };
+    im.src = src.currentSrc || src.src;
+  };
+  const open = fig => {
+    const scope = fig.closest('section,article') || document;
+    list = Array.from(scope.querySelectorAll('figure.shot.has-img'));
+    last = document.activeElement;
+    lb.classList.add('on'); document.documentElement.style.overflow = 'hidden';
+    show(list.indexOf(fig)); lb.querySelector('[data-a=close]').focus();
+  };
+  const close = () => { lb.classList.remove('on'); document.documentElement.style.overflow = '';
+    im.removeAttribute('src'); if (last) last.focus(); };
+
+  document.addEventListener('click', e => {
+    const f = e.target.closest('figure.shot.has-img'); if (f && !lb.contains(f)) { e.preventDefault(); open(f); }
+  });
+  document.addEventListener('keydown', e => {
+    if (!lb.classList.contains('on')) {
+      const f = document.activeElement;
+      if (f && f.matches && f.matches('figure.shot.has-img') && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); open(f); }
+      return;
+    }
+    const k = e.key;
+    if (k === 'Escape') close();
+    else if (k === 'ArrowRight') show(i + 1);
+    else if (k === 'ArrowLeft') show(i - 1);
+    else if (k === '+' || k === '=') zoomAt(1.25);
+    else if (k === '-') zoomAt(0.8);
+    else if (k === '0') fit();
+    else if (k === '1') one();
+    else return;
+    e.preventDefault();
+  });
+  lb.addEventListener('click', e => {
+    const a = e.target.closest('[data-a]') && e.target.closest('[data-a]').dataset.a;
+    if (a === 'close') close(); else if (a === 'prev') show(i - 1); else if (a === 'next') show(i + 1);
+    else if (a === 'in') zoomAt(1.25); else if (a === 'out') zoomAt(0.8);
+    else if (a === 'fit') fit(); else if (a === 'one') one();
+    else if (a === 'new') window.open(im.src, '_blank', 'noopener');
+    else if (e.target === stage) { /* 빈 곳 클릭은 무시 — 끌기와 헷갈리지 않게 */ }
+  });
+  stage.addEventListener('wheel', e => { e.preventDefault();
+    zoomAt(Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.0018)), e.clientX, e.clientY); }, {passive: false});
+  stage.addEventListener('dblclick', e => {
+    if (e.target.closest('button')) return;
+    if (Math.abs(s - fitS) < 0.01) { const t = 1 / (im.dataset.k || 1); zoomAt(t / s, e.clientX, e.clientY); } else fit();
+  });
+  // 끌기·핀치 — 포인터 이벤트 하나로 마우스와 손가락을 함께 처리
+  const pts = new Map(); let pinch0 = 0, s0 = 1, moved = false;
+  stage.addEventListener('pointerdown', e => { if (e.target.closest('button')) return;
+    stage.setPointerCapture(e.pointerId); pts.set(e.pointerId, {x: e.clientX, y: e.clientY});
+    moved = false; stage.classList.add('drag');
+    if (pts.size === 2) { const [a, b] = [...pts.values()]; pinch0 = Math.hypot(a.x - b.x, a.y - b.y); s0 = s; } });
+  stage.addEventListener('pointermove', e => { if (!pts.has(e.pointerId)) return;
+    const p = pts.get(e.pointerId), dx = e.clientX - p.x, dy = e.clientY - p.y;
+    pts.set(e.pointerId, {x: e.clientX, y: e.clientY});
+    if (pts.size === 1) { x += dx; y += dy; if (Math.abs(dx) + Math.abs(dy) > 2) moved = true; apply(); }
+    else if (pts.size === 2) { const [a, b] = [...pts.values()];
+      const d = Math.hypot(a.x - b.x, a.y - b.y);
+      zoomAt(clamp(s0 * d / pinch0) / s, (a.x + b.x) / 2, (a.y + b.y) / 2); } });
+  const up = e => { pts.delete(e.pointerId); if (!pts.size) stage.classList.remove('drag'); };
+  stage.addEventListener('pointerup', up); stage.addEventListener('pointercancel', up);
+  // 한 손가락으로 좌우로 휙 넘기면 다음 장 (맞춤 상태일 때만)
+  let sx = 0;
+  stage.addEventListener('touchstart', e => { sx = e.touches[0].clientX; }, {passive: true});
+  stage.addEventListener('touchend', e => {
+    if (e.changedTouches.length !== 1 || Math.abs(s - fitS) > 0.01) return;
+    const d = e.changedTouches[0].clientX - sx; if (Math.abs(d) > 70) show(i + (d < 0 ? 1 : -1)); }, {passive: true});
+  window.addEventListener('resize', () => { if (lb.classList.contains('on')) fit(); });
+})();
 """
 
 
@@ -693,29 +1012,63 @@ def build_site(commons, screens, out):
            '<div id="qr" class="results" hidden></div>'
            '<div id="tree">']
     if commons:
-        nav.append('<details class="grp" open><summary>공통</summary><div class="grp-in">')
+        nav.append('<section class="guide" aria-label="공통 안내">'
+                   f'<div class="guide-h">{ICON_BOOK}<span>공통 안내</span>'
+                   f'<em>{len(commons)}개</em></div>')
         for cid, c in commons.items():
-            nav.append(f'<a href="#{anchor(cid)}">{html.escape(c["doc_name"])}</a>')
-        nav.append("</div></details>")
+            nav.append(f'<a class="g" href="#{anchor(cid)}">{ICON_DOC}'
+                       f'<span>{html.escape(c["doc_name"])}</span></a>')
+        nav.append("</section>")
+        nav.append('<div class="nav-label">메뉴별 화면</div>')
     for top, items in groups.items():
         op = " open" if top in MENU_OPEN else ""
         nav.append(f'<details class="grp" data-top="{html.escape(top)}"{op}>'
-                   f"<summary>{html.escape(top)}</summary><div class=\"grp-in\">")
-        # 묶음 이름과 같은 이름의 화면이 이미 목차에 있으면 머리글을 따로 달지 않는다.
-        # ('설문 관리' 아래에 다시 [설문 관리] 라고 쓰지 않기 위한 것)
+                   f'<summary><span class="ico">{TOP_ICONS.get(top, ICON_DEFAULT)}</span>'
+                   f'<span class="tn">{html.escape(top)}</span></summary><div class="grp-in">')
+        # 묶음 이름과 같은 이름으로 시작하는 화면이 있으면(예: 「공용업무 — 목록」),
+        # 그 이름을 2차로 세우고 화면들은 3차로 넣는다. 3차에서는 부모 이름을 반복하지 않는다.
         own = [sc["screen_name"] for sc in items if not sub_group(sc)]
-        dup = {s for s in (sub_group(sc) for sc in items)
-               if s and any(n.startswith(s) for n in own)}
-        seen_sub = None
+        dup = {s_ for s_ in (sub_group(sc) for sc in items)
+               if s_ and any(n.startswith(s_) for n in own)}
+
+        def short(name, parent):
+            for sep in (" — ", " - ", " – "):
+                if name.startswith(parent + sep):
+                    return name[len(parent) + len(sep):]
+            return name
+
+        open_wrap = None
+        made = set()
         for sc in items:
             sub = sub_group(sc)
-            if sub != seen_sub:
-                if sub and sub not in dup:
-                    nav.append(f'<div class="nav-sub">{html.escape(sub)}</div>')
-                seen_sub = sub
-            cls = ' class="ind"' if sub else ""
-            nav.append(f'<a href="#{anchor(sc["screen_id"])}"{cls}>'
-                       f'{html.escape(sc["screen_name"])}</a>')
+            name = sc["screen_name"]
+            href = f'#{anchor(sc["screen_id"])}'
+            parent = sub
+            if not sub:
+                parent = next((d for d in dup if name.startswith(d)), None)
+            if parent:
+                if open_wrap != parent:
+                    if open_wrap:
+                        nav.append("</div>")
+                    if parent not in made:
+                        if name == parent:
+                            nav.append(f'<a class="l2 has" href="{href}">{html.escape(parent)}</a>')
+                            made.add(parent)
+                            nav.append('<div class="l3wrap">')
+                            open_wrap = parent
+                            continue
+                        nav.append(f'<div class="l2 has">{html.escape(parent)}</div>')
+                        made.add(parent)
+                    nav.append('<div class="l3wrap">')
+                    open_wrap = parent
+                nav.append(f'<a class="l3" href="{href}">{html.escape(short(name, parent))}</a>')
+            else:
+                if open_wrap:
+                    nav.append("</div>")
+                    open_wrap = None
+                nav.append(f'<a class="l2" href="{href}">{html.escape(name)}</a>')
+        if open_wrap:
+            nav.append("</div>")
         nav.append("</div></details>")
 
     nav.append("</div>")   # #tree 닫기
@@ -742,7 +1095,7 @@ def build_site(commons, screens, out):
 
     doc = f"""<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>아파트ok 사용자 매뉴얼</title>
+<title>{html.escape(TITLE)}</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@500;700&family=IBM+Plex+Sans+KR:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>{CSS}</style></head><body>

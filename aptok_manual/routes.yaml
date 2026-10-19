@@ -23,26 +23,35 @@ login:
   pw_field: "input[type=password]"
   submit: "로그인"
   ready: "관리업무"
-  complex: 성공금천아파트   # 로그인 후 단지 선택 화면이 뜨면 고를 단지
+  complex: 디엑스삼성아파트   # 테스트 단지(가상 데이터). 실단지로 바꾸지 말 것
 
 # 자료 가리기. 아래 적은 열만 가린다.
+# 브라우저 시계. 목록의 기본 조회 기간이 이 날짜 기준이라 자료가 있는 최근 날짜로 둔다.
+fixed_time: "2026-10-19T09:00:00"
+
+# 쓰기 차단 중에도 통과시킬 POST 요청(주소 조각). 읽기만 하는 요청만 넣는다.
+#   import/preview : 장기수선 개통 — 엑셀을 읽어 확인 화면만 만든다. DB 저장(/import/save)은 계속 막힌다.
+allow_post:
+  - /api/ltrpnew/import/preview
+
+# 마스킹 정책 (2026-10-18): 디엑스삼성아파트는 가상 데이터라 자료는 그대로 보여 준다.
+#   세대주·전화번호 칸만 가린다. 사업자번호·로그인 사용자 이름은 가리지 않는다.
 mask_data: true
 mask_columns:
-  - 성명:1
-  - 이름:1
-  - 담당자:1
-  - 접수자:1
+  - 세대주:1
+  - 성명:1        # 세대관리·입대의 명단의 입주민 이름
+  - 소유자:1      # 차량관리
+  - 입주자명:1
   - 연락처:2
-  - 세대:2
-  - 동호:2
-  - 거래처:3
+  - 전화번호:2
+  - 휴대폰:2
+  - 핸드폰:2
+  - 요청 IP:4     # 보안(엑셀 다운로드 기록)의 실제 접속 IP
 mask_keep_chars: 3
-mask_id_numbers: true
+mask_id_numbers: false
 
-# 모든 화면에 공통 적용할 마스킹. 화면별 mask 로 보완한다.
-mask_global:
-  - ".userName"
-  - ".gnb-user"
+# 2배 해상도(WebP 저장). 매뉴얼에서 눌러 확대할 때 선명하게
+scale: 2
 
 routes:
 
@@ -96,25 +105,95 @@ routes:
       - url: https://aptok.co.kr/minwon/total/APKE000001
       - wait: 2500
       - shot: cs-all-01.png
+      # 첫 줄 민원을 체크하고 [일일업무보고] — 일일일지 작성 화면이 열린다(저장은 하지 않는다)
+      # 체크박스 input 은 투명(opacity 0)이라 그 위의 label 을 누른다
+      - selector: "tbody label.fa-ckbox"
+      - text: 일일업무보고
+      - wait: 2500
       - shot: cs-all-02.png
 
   - screen_id: cs-phone
     steps:
       - url: https://aptok.co.kr/callmgr/call/APKB000201
       - wait: 2500
+      # 실제 고객 기록이 섞여 있다. 직원 테스트 휴대폰(뒷번호 6393·6118) 기록만 남기고 찍는다.
+      - only_rows: ["6393", "6118", "!문제점"]
       - shot: cs-phone-01.png
+      # 번호 등록 창 — 6118 기록에서 창만 열어 찍고 [취소]로 닫는다(등록하지 않는다)
+      - reg_phone: "6118"
+      - expect_modal: 이름만 메모
+      - wait: 800
+      - shot: cs-phone-02.png
+      - close_modal: 취소
 
   - screen_id: cs-call-hist
     steps:
       - url: https://aptok.co.kr/callmgr/call/APKB000001
       - wait: 2500
+      - only_rows: ["6393", "6118", "!문제점"]
       - shot: cs-call-hist-01.png
+      # 남은 첫 줄의 [내용] 칸을 눌러 상세를 연다(버튼이 아닌 칸을 누른다)
+      - selector: "tbody tr:visible td:nth-child(7)"
+      - wait: 2000
       - shot: cs-call-hist-02.png
+      # [민원으로 등록] 창 → [세대업무 등록 화면]까지 찍는다. 등록 화면에서 [저장]은 누르지 않는다.
+      # ※ 이 통화(12:14 누수)를 실제로 등록하고 나면 [민원으로 등록] 버튼이 사라져 03·04는 다시 찍을 수 없다.
+      - text: 민원으로 등록
+      - expect_modal: 세대업무 등록 화면
+      - wait: 1500
+      - shot: cs-call-hist-03.png
+      - selector: ".cmp-foot a:has-text('세대업무 등록 화면')"
+      - wait: 3000
+      - expect: 처리 정보
+      - shot: cs-call-hist-04.png
+
+  - screen_id: cs-call-minwon
+    # 12:14 누수 통화를 세대업무로 등록한 뒤에 찍는다(cs-call-hist-05)
+    steps:
+      - url: https://aptok.co.kr/callmgr/call/APKB000005?callNo=10071
+      - wait: 3000
+      - expect: 스크립트
+      - shot: cs-call-hist-05.png
+
+  - screen_id: guide-callpopup
+    # 공통 문서 「통화매니저 알림창과 최근 기록」 — 알림창 → 최근 기록 → 대화 화면 흐름 (2026-10-19)
+    # 같은 대표번호에 실제 고객 기록이 섞여 있다. 최근 기록은 테스트 휴대폰(6393·6118) 기록만 남긴다.
+    steps:
+      - url: https://aptok.co.kr/service/main
+      - wait: 3000
+      - mark: {n: 1, css: ".scrp-pill"}
+      - shot: cp-01.png
+      - selector: ".scrp-pill"
+      - wait: 1000
+      - mark: {n: 2, css: ".scrp-panel .scrp-head a:first-of-type"}
+      - shot: cp-02.png
+      - js: |
+          const v = document.getElementById('screenPopWidget').__vue__;
+          v.openRecent();
+          for (let i = 0; i < 30 && (!v.recent.rows.length || v.recent.loading); i++) await new Promise(r => setTimeout(r, 200));
+          const keep = v.recent.rows.filter(x => /(6393|6118)$/.test(String(x.peer || '')) && !/토큰|문제점/.test(String(x.desc || '')));
+          v.recent.rows = keep;
+          v.recent.totalPage = v.recent.page;
+          await new Promise(r => setTimeout(r, 500));
+          return keep.length ? 'ok' : 'X 테스트 기록 없음';
+      - wait: 800
+      - mark: {n: 3, css: ".scrp-rc-row"}
+      - shot: cp-03.png
+      - js: |
+          ScreenPop.openChat(10071, null, '');
+          await new Promise(r => setTimeout(r, 2500));
+          return 'ok';
+      - wait: 800
+      - mark: {n: 4, css: ".scrp-chat-who"}
+      - mark: {n: 5, css: ".scrp-turn-hit .scrp-bubble"}
+      - shot: cp-04.png
+      - js: "document.getElementById('screenPopWidget').__vue__.closeChat(); return 'ok';"
 
   - screen_id: cs-sms-hist
     steps:
       - url: https://aptok.co.kr/callmgr/msg/APKC000001
       - wait: 2500
+      - only_rows: ["6393", "6118"]
       - shot: cs-sms-hist-01.png
 
   - screen_id: cs-svc-req
@@ -128,8 +207,14 @@ routes:
       - url: https://aptok.co.kr/callmgr/setting/APKH000001
       - wait: 2500
       - shot: cs-setting-01.png
+      - text: ARS 관리
+      - wait: 1200
       - shot: cs-setting-02.png
+      - text: 땡큐문자
+      - wait: 1200
       - shot: cs-setting-03.png
+      - text: 스크린팝
+      - wait: 1200
       - shot: cs-setting-04.png
 
   - screen_id: cs-msg-sent
@@ -153,6 +238,10 @@ routes:
       - wait: 2000
       - expect: 문항 구성
       - shot: cs-survey-form-01.png
+      - scroll: 익명 여부                  # 같은 화면 아래쪽: 익명·결과 공개 정책·발송 채널
+      - shot: cs-survey-form-02.png
+        full: false
+      - scroll: "css:body"
       - text: 새 질문 추가
       - wait: 800
       - shot: cs-survey-form-03.png
@@ -160,8 +249,6 @@ routes:
       - wait: 800
       - shot: cs-survey-form-04.png
 
-  # cs-survey-form-02.png (익명·공개정책·발송채널 영역)은 form-01 과 같은 화면의
-  # 아래쪽이다. 스크롤 촬영이 필요하면 수동으로 잘라 쓴다.
 
   - screen_id: cs-survey-detail
     steps:
@@ -171,10 +258,15 @@ routes:
       - wait: 2500
       - expect: 참여 현황
       - shot: cs-survey-detail-01.png
+      - scroll: 설문 내용                  # 문항별 응답
       - shot: cs-survey-detail-02.png
+        full: false
+        marks: false                      # 4번 표시가 화면 밖 버튼을 가리켜 빈 상자가 생김
+      - text: 활용하기                     # 복사본 등록 화면이 열릴 뿐 저장되지 않는다
+      - wait: 2500
+      - expect: 문항 구성
+      - shot: cs-survey-detail-03.png
 
-  # detail-03(활용하기로 열리는 복제 등록 화면)은 실제 등록 화면과 같은 모양이라
-  # 촬영을 생략하고 form-01 을 재사용해도 된다.
 
   - screen_id: cs-stat
     steps:
@@ -423,6 +515,10 @@ routes:
     steps:
       - url: https://aptok.co.kr/into/group/APEF000001
       - wait: 2500
+      - text: 부녀회
+      - wait: 800
+      - text: 디엑스삼성 부녀회
+      - wait: 1500
       - shot: res-community-01.png
 
   - screen_id: hr-staff
@@ -535,19 +631,17 @@ routes:
       - tab: 개별 설정
       - shot: hr-permission-individual-01.png
         expect: 직원목록
-      - text: X
+      - text: 이종태
         within: 직원목록
-      - wait: 800
-      - expect_modal: 그룹권한으로 설정되어 있습니다
+      - wait: 1200
+      - expect_modal: 설정되어 있습니다
       - shot: hr-permission-individual-02.png
       - close_modal: 확인
 
   - screen_id: res-election-list
     steps:
-      - top: 입주자관리
-      - side: 선거관리위원회
-      - side: 명단
-      - wait: 900
+      - url: https://aptok.co.kr/into/vote/APEE000001   # 사이드 [명단]이 입대의 명단과 이름이 같아 주소로 연다
+      - wait: 2500
       - shot: res-election-list-01.png
 
   - screen_id: res-election-minutes
@@ -557,3 +651,212 @@ routes:
       - side: 회의록
       - wait: 900
       - shot: res-election-minutes-01.png
+
+  # ---- 2026-10 업데이트 ----
+  - screen_id: cs-line-apply
+    steps:
+      - url: https://aptok.co.kr/callmgr/apply/APKA000005
+      - wait: 2500
+      - text: + 회선 신청
+      - wait: 1500
+      - expect: 신청할 단지 전화번호 입력
+      - shot: cs-line-apply-01.png
+
+  - screen_id: cs-msg-sent-detail
+    steps:
+      - url: https://aptok.co.kr/minwon/message/APKG000101
+      - wait: 2500
+      - selector: "a:has-text('상세'), button:has-text('상세')"
+      - wait: 1500
+      - shot: cs-msg-sent-02.png
+
+  - screen_id: cs-msg-template
+    steps:
+      - url: https://aptok.co.kr/minwon/message/APKG000201
+      - wait: 2500
+      - expect: 문자 템플릿
+      - shot: cs-msg-template-01.png
+      - text: + 새 문자 템플릿
+      - wait: 1000
+      - shot: cs-msg-template-02.png
+      - text: 알림톡(카카오톡) 템플릿
+      - wait: 1000
+      - text: + 우리 단지 알림톡 신청
+      - wait: 1000
+      - shot: cs-msg-template-03.png
+
+  # 메시지 발송 — [발송]은 누르지 않는다. 촬영이 화면 전체 길이라 아래쪽 '점검'까지 한 장에 담긴다.
+  - screen_id: cs-msg-send
+    mask_data: false        # 개인정보가 없는 입력 화면. 켜 두면 버튼·라벨이 가려진다
+    steps:
+      - url: https://aptok.co.kr/minwon/message/APKG000105
+      - wait: 2500
+      - expect: 수신자
+      - shot: cs-msg-send-01.png
+      - selector: "label:has-text('문자(아파트OK)')"
+      - wait: 1000
+      - shot: cs-msg-send-02.png
+
+  # 이용요금·결제 — [충전 신청]은 누르지 않는다. 입금 계좌는 회사 공용 계좌라 가리지 않는다.
+  - screen_id: bill-main
+    steps:
+      - url: https://aptok.co.kr/billing/APLA000001?tab=use
+      - wait: 2500
+      - expect: 충전 잔액
+      - shot: bill-main-01.png
+      - text: 충전하기
+      - wait: 1000
+      - shot: bill-main-02.png
+      - url: https://aptok.co.kr/billing/APLA000001?tab=set
+      - wait: 2500
+      - shot: bill-main-03.png
+
+  # ---- 장기수선계획 (2026-10) ----
+  # 전기 계획 개통 — 엑셀을 올려 확인 화면까지만 찍는다. [확인한 대로 저장]은 누르지 않는다(저장 요청도 차단됨).
+  - screen_id: ltrp-onboard
+    steps:
+      - url: https://aptok.co.kr/ltrpnew/mgmt/APGN000018
+      - wait: 2500
+      - expect: 기준 조정본
+      - shot: ltrp-onboard-01.png
+      - upload: testdata/seed/upload/장기수선계획서_디엑스삼성_2026정기조정.xlsx   # 가상 계획서(make_ltrp.py). 실단지 파일 쓰지 않음
+      - wait: 5000
+      - expect: 확인 필요
+      - shot: ltrp-onboard-02.png
+        full: false
+      - scroll: "css:#list h4"        # 확인 필요 항목의 첫 묶음 제목
+      - shot: ltrp-onboard-03.png
+        full: false
+
+  # 장기수선계획 나머지 화면 — 모두 보기·창 열기까지만. 저장·마감·상신은 누르지 않는다.
+  - screen_id: ltrp-history
+    steps:
+      - url: https://aptok.co.kr/ltrpnew/mgmt/APGN000001
+      - wait: 2500
+      - expect: 조정 이력
+      - shot: ltrp-history-01.png
+
+  - screen_id: ltrp-adhoc
+    steps:
+      - url: https://aptok.co.kr/ltrpnew/mgmt/APGN000001
+      - wait: 2500
+      - text: ＋ 수시조정 등록
+      - expect_modal: 수시조정 입력
+      - wait: 800
+      - shot: ltrp-adhoc-01.png
+      - close_modal: 닫기
+
+  - screen_id: ltrp-compare
+    steps:
+      - url: https://aptok.co.kr/ltrpnew/mgmt/APGN000013
+      - wait: 3000
+      - expect: 조정 전·후 대비표
+      - shot: ltrp-compare-01.png
+        full: false
+
+  - screen_id: ltrp-info
+    steps:
+      - url: https://aptok.co.kr/ltrpnew/draft/APGN000002
+      - wait: 3000
+      - expect: 단지 개요
+      - shot: ltrp-info-01.png
+        full: false
+
+  - screen_id: ltrp-rules
+    steps:
+      - url: https://aptok.co.kr/ltrpnew/draft/APGN000003
+      - wait: 3000
+      - expect: 예외지출
+      - shot: ltrp-rules-01.png
+        full: false
+
+  - screen_id: ltrp-review
+    steps:
+      - url: https://aptok.co.kr/ltrpnew/draft/APGN000004
+      - wait: 3500
+      - expect: 수선항목 검토서
+      - shot: ltrp-review-01.png
+        full: false
+      # 줄 가운데를 누르면 금액 칸이 입력 모드가 된다. 공사종별 칸(4번째)을 눌러야 검토창이 열린다
+      - selector: "tbody tr:has-text('방수') td:nth-child(4)"
+      - wait: 1500
+      - expect: 검토결과
+      - shot: ltrp-review-02.png
+        full: false
+
+  - screen_id: ltrp-summary
+    steps:
+      - url: https://aptok.co.kr/ltrpnew/draft/APGN000005
+      - wait: 3500
+      - expect: 적립예정액
+      - shot: ltrp-summary-01.png
+        full: false
+
+  - screen_id: ltrp-3yr
+    steps:
+      - url: https://aptok.co.kr/ltrpnew/plan/APGN000006
+      - wait: 3000
+      - expect: 3년 합계
+      - shot: ltrp-3yr-01.png
+        full: false
+
+  - screen_id: ltrp-worktype
+    steps:
+      - url: https://aptok.co.kr/ltrpnew/facility/APGN000011
+      - wait: 3000
+      - expect: 값의 세 단계
+      - shot: ltrp-worktype-01.png
+        full: false
+
+  - screen_id: ltrp-ledger
+    steps:
+      - url: https://aptok.co.kr/ltrpnew/facility/APGN000021
+      - wait: 3000
+      - expect: 장기수선계획 시설대장
+      - shot: ltrp-ledger-01.png
+        full: false
+
+  - screen_id: ltrp-facility
+    steps:
+      - url: https://aptok.co.kr/ltrpnew/facility/APGN000009
+      - wait: 3000
+      - expect: 세부 시설대장
+      - shot: ltrp-facility-01.png
+        full: false
+      - url: https://aptok.co.kr/ltrpnew/facility/APGN000012
+      - wait: 3000
+      - expect: 기본정보
+      - shot: ltrp-facility-02.png
+        full: false
+      - url: https://aptok.co.kr/ltrpnew/facility/APGN000010?recId=10008126   # 디엑스삼성 103동 옥상 방수
+      - wait: 3000
+      - expect: 수선기준
+      - shot: ltrp-facility-03.png
+        full: false
+
+  - screen_id: ltrp-usage
+    steps:
+      - url: https://aptok.co.kr/ltrpnew/usage/APGN000007
+      - wait: 3000
+      - expect: 적립·사용현황
+      - shot: ltrp-usage-01.png
+        full: false
+
+  - screen_id: fac-expense-list
+    steps:
+      - url: https://aptok.co.kr/ltrpnew/usage/APGN000008
+      - wait: 3000
+      - expect: 결재현황            # '예산과목'은 숨은 드롭다운 항목에 먼저 걸린다
+      - shot: fac-expense-list-01.png
+
+  - screen_id: fac-expense-form
+    steps:
+      - url: https://aptok.co.kr/ltrpnew/usage/APGN000008?write=1
+      - wait: 3500
+      - expect: 문서 정보
+      - shot: fac-expense-form-01.png
+        full: false
+      # '품의 내용 · 상신'은 위쪽 진행 표시에도 있어 그쪽에 걸린다. 본문 안내 문구로 찾는다
+      - scroll: 위에서 고른 내용으로 본문 초안
+      - shot: fac-expense-form-02.png
+        full: false

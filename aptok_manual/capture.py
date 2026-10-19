@@ -35,7 +35,14 @@ BASE = Path(__file__).resolve().parent
 _ROOT = BASE if (BASE / "src").is_dir() else BASE.parent
 OUT = _ROOT / "captures"
 VIEWPORT = {"width": 1920, "height": 1080}
-FIXED_TIME = "2026-01-02T09:00:00"  # 시계 고정값
+FIXED_TIME = "2026-10-16T09:00:00"  # 시계 고정값. routes.yaml 의 fixed_time 이 있으면 그 값을 쓴다.
+# 목록 화면의 기본 조회 기간이 이 날짜 기준으로 잡히므로, 자료가 있는 최근 날짜로 둔다.
+SCALE = 2                # 2배 해상도로 찍는다 — 매뉴얼에서 눌러 확대해도 글자가 선명하다 (2026-10-18)
+WEBP_QUALITY = 86        # 저장은 WebP. 2배 PNG 는 너무 무겁다
+WEBP_MAX = 16000         # WebP 한 변 한계(16383) 아래로 맞춘다. 긴 전체 화면은 줄여서 저장
+PENDING_MARKS = []       # mark 단계로 쌓아 두었다가 다음 shot 에 그린다
+SHOT_FULL = True         # shot 단계에 full: false 를 주면 보이는 화면만 찍는다
+ROUTE_MASK_DATA = True   # 경로마다 mask_data: false 로 자료 가리기를 끌 수 있다
 
 # 절대 누르지 않는다. 저장·삭제·발송 계열.
 FORBIDDEN = {"저장", "삭제", "결재요청", "상신", "발송", "전송", "송출", "탈퇴하기"}
@@ -73,17 +80,25 @@ MASK_DATA_JS = r"""
     const K = (keep === null || keep === undefined) ? DEFAULT_KEEP : keep;
     const v = s.trim();
     if (!v) return s;
+    // 전화번호 모양(숫자·*·하이픈)은 칸이 넘치지 않게 모양을 살려 가린다: 010-****-****
+    if (/^0\d{1,2}[-\s][\d*]{3,4}[-\s][\d*]{4}$/.test(v)) return v.slice(0, 4) + v.slice(4).replace(/[\d*]/g, '*');
     if (ID_PAT.test(v)) return DOT.repeat(Math.min(v.length, 12));
     if (v.length <= K) return v;
     return v.slice(0, K) + DOT.repeat(Math.min(v.length - K, 12));
   };
 
   // 칸 안의 글자 조각을 직접 바꾼다. 아이콘과 섞여 있어도 빠지지 않는다.
+  // 칸 안에 있어도 가리지 않는 버튼 글자: "+ 번호 등록", "등록", "지난 대화" 등
+  const BUTTON_TEXT = /^\s*(\+\s*)?(번호 등록|등록|수정|삭제|상세|보기|지난 대화|전화|문자|선택|추가|메모)\s*$/;
   const maskInside = (root, keep) => {
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
       acceptNode: (node) => {
         const p = node.parentElement;
         if (!p || SKIP_TAG.has(p.tagName)) return NodeFilter.FILTER_REJECT;
+        // 버튼 글자는 개인정보가 아니다. [+ 번호 등록] 같은 버튼은 그대로 둔다 (2026-10-17)
+        if (p.closest('button, [role=button], .btn, [class*=Btn], [class*=btn], [class*=Chip], [class*=chip]'))
+          return NodeFilter.FILTER_REJECT;
+        if (BUTTON_TEXT.test(node.nodeValue || '')) return NodeFilter.FILTER_REJECT;
         return node.nodeValue && node.nodeValue.trim()
                ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
       }
@@ -227,6 +242,19 @@ MASK_DATA_JS = r"""
     });
   }
 
+  // 휴대폰 번호는 어느 칸에 있든 가린다 — 통화매니저가 민원 내용에 「상대번호 010-…」를 적어 넣는다 (2026-10-19)
+  // 고객센터 02-858-3001 같은 유선 번호는 그대로 둔다
+  const MOBILE = /01[016789][-\s.]?[\d*]{3,4}[-\s.]?[\d*]{4}/g;
+  const MOB1 = /01[016789][-\s.]?[\d*]{3,4}[-\s.]?[\d*]{4}/;
+  const tw = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+    acceptNode: nd => (nd.parentElement && !SKIP_TAG.has(nd.parentElement.tagName) && MOB1.test(nd.nodeValue || ''))
+      ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT });
+  const mob = []; while (tw.nextNode()) mob.push(tw.currentNode);
+  mob.forEach(nd => { nd.nodeValue = nd.nodeValue.replace(MOBILE, '010-****-****'); n++; });
+  document.querySelectorAll('textarea, input[type=text], input:not([type])').forEach(el => {
+    if (el.value && MOB1.test(el.value)) { el.value = el.value.replace(MOBILE, '010-****-****'); n++; }
+  });
+
   return n;
 }
 """
@@ -234,12 +262,14 @@ MASK_DATA_JS = r"""
 MASK_JS = r"""
 () => {
   if (!document || !document.body) return;
-  const pat = /(01[016-9]-?\d{3,4}-?\d{4})|(제?\s?\d{1,3}동\s?\d{1,4}호)/;
+  // 전화번호만 가린다. 동호수는 가상 단지 자료라 그대로 둔다 (2026-10-18 마스킹 정책)
+  const pat = /(01[016-9]-?\d{3,4}-?\d{4})|(0\d{1,2}-\d{3,4}-\d{4})/;
   const skip = new Set(['SCRIPT','STYLE','HEAD']);
   const walk = (el) => {
     for (const n of el.children) {
       if (skip.has(n.tagName)) continue;
-      if (n.children.length === 0 && pat.test(n.textContent || '')) {
+      if (n.children.length === 0 && pat.test(n.textContent || '')
+          && !/858-3001/.test(n.textContent || '')) {   // 고객센터 대표번호는 둔다
         n.classList.add('mask-pii');
       } else walk(n);
     }
@@ -247,6 +277,179 @@ MASK_JS = r"""
   walk(document.body);
 }
 """
+
+# 번호 표시 — 매뉴얼 설명의 단계 번호와 같은 번호를 화면 요소 위에 그린다 (2026-10-18)
+#   routes.yaml:  - mark: {n: 3, text: 승인}            보이는 글자로 찾기
+#                 - mark: {n: 4, css: "a.btnMinConfirm"} CSS 로 찾기
+#                 - mark: {n: 2, text: 조정일자, within: 기준 조정본, pad: 6}
+#   여러 개를 쌓아 두면 바로 다음 shot 에 함께 그려지고, 찍은 뒤 지운다.
+MARK_JS = r"""
+(items) => {
+  const norm = s => (s || '').replace(/\s+/g, ' ').trim();
+  const visible = e => { const r = e.getBoundingClientRect();
+    const st = getComputedStyle(e);
+    if (!(r.width > 2 && r.height > 2 && st.visibility !== 'hidden' && st.display !== 'none')) return false;
+    // 투명하게 접혀 있는 패널(알림창 등) 안의 버튼은 보이지 않는 것으로 친다
+    for (let p = e, i = 0; p && i < 15; p = p.parentElement, i++)
+      if (parseFloat(getComputedStyle(p).opacity) < 0.1) return false;
+    // 접힌 상자(overflow:hidden) 밖으로 밀려나 안 보이는 요소도 뺀다
+    for (let p = e.parentElement, i = 0; p && i < 15; p = p.parentElement, i++) {
+      const ov = getComputedStyle(p).overflow;
+      if (ov === 'hidden' || ov === 'clip') { const q = p.getBoundingClientRect();
+        if (r.bottom <= q.top + 1 || r.top >= q.bottom - 1 || r.right <= q.left + 1 || r.left >= q.right - 1) return false; }
+    }
+    return true; };
+  // 떠 있는 안내창 — 열려 있으면 그 안의 요소를 먼저 고른다(뒤에 깔린 같은 이름 버튼을 피한다)
+  const MODAL = Array.from(document.querySelectorAll('.modal, [class*=modal], [class*=Modal], .layer, [class*=popup], [class*=Popup], [role=dialog]'))
+    .filter(m => { const r = m.getBoundingClientRect(); const st = getComputedStyle(m);
+      return r.width > 150 && r.height > 100 && st.display !== 'none' && st.visibility !== 'hidden'
+        && r.width < window.innerWidth * 0.95 && !m.closest('.__mk'); })
+    .sort((a, b) => a.getBoundingClientRect().width * a.getBoundingClientRect().height
+                  - b.getBoundingClientRect().width * b.getBoundingClientRect().height)[0]
+    // 클래스 이름이 제각각인 안내창 — 화면 전체를 덮는 고정(fixed) 어두운 막을 찾고, 그 막 안을 안내창으로 본다
+    || Array.from(document.querySelectorAll('body *')).filter(e => {
+         if (e.closest('.__mk')) return false;
+         const st = getComputedStyle(e); if (st.position !== 'fixed' || st.display === 'none' || st.visibility === 'hidden') return false;
+         const r = e.getBoundingClientRect();
+         return r.width >= window.innerWidth * 0.9 && r.height >= window.innerHeight * 0.9 && e.querySelector('a,button');
+       }).sort((a, b) => (parseInt(getComputedStyle(b).zIndex) || 0) - (parseInt(getComputedStyle(a).zIndex) || 0))[0]
+    || null;
+  const inside = (e, w) => { if (!w) return true;
+    for (let p = e.parentElement, i = 0; p && i < 12; p = p.parentElement, i++)
+      if (norm(p.textContent).includes(w)) return true; return false; };
+  const NAV = 'header,nav,aside,.gnb,.lnb,[class*=gnb],[class*=lnb],[class*=sidebar],[class*=leftMenu],[class*=recent]';
+  // 비교용 열쇠 — 글자·숫자만 남긴다. 「✓ 검토 완료」「💾 저장」「＋ 수시조정 등록」의 기호를 무시한다
+  const key = s => (s || '').replace(/[^\p{L}\p{N}]/gu, '');
+  const CLICK = 'a,button,label,[role=button],input,select,[onclick],[class*=btn],[class*=Btn]';
+  const byText = (T0, contains) => {
+    const K = key(T0);
+    if (!K) return [];
+    const c = Array.from(document.querySelectorAll('body *')).filter(e => {
+      if (e.closest('.__mk') || ['SCRIPT','STYLE','OPTION'].includes(e.tagName)) return false;
+      const t = key(e.textContent), v = key(e.value);
+      return t === K || v === K || (contains && t.includes(K));
+    });
+    c.sort((a, b) => a.querySelectorAll('*').length - b.querySelectorAll('*').length);
+    return c;
+  };
+  const find = (it) => {
+    let c = [];
+    if (it.css) c = Array.from(document.querySelectorAll(it.css));
+    else {
+      // any: 단계 설명의 [버튼] 이름들. 누를 수 있는 요소를 먼저 찾고(뒤에 적힌 이름부터 — 보통 실제로 누르는 버튼),
+      //      없으면 글자만 맞는 요소를 쓴다
+      const names = it.any || [it.text];
+      const pick = (nm) => {
+        let h = byText(nm, it.contains).filter(e => visible(e) && inside(e, it.within));
+        // 본문 단계면 상단·왼쪽 메뉴에 같은 글자가 있어도 본문 쪽을 고른다
+        if (it.zone !== 'nav') { const m = h.filter(e => !e.closest(NAV)); if (m.length) h = m; }
+        if (MODAL && it.zone !== 'nav') { const m = h.filter(e => MODAL.contains(e)); if (m.length) h = m; }
+        else { const m = h.filter(e => e.closest(NAV)); if (m.length) h = m; }
+        return h;
+      };
+      const order = it.zone === 'nav' ? names : names.slice().reverse();
+      for (const nm of order) {
+        const h = pick(nm).filter(e => e.closest(CLICK));
+        if (h.length) { c = h; break; }
+      }
+      if (!c.length) for (const nm of names) { const h = pick(nm); if (h.length) { c = h; break; } }
+    }
+    c = c.filter(e => visible(e) && inside(e, it.within));
+    if (!c.length) return null;
+    const e = c[Math.min(it.nth || 0, c.length - 1)];
+    // 글자만 감싼 작은 요소면 누를 수 있는 바깥 상자로 넓힌다
+    return (it.css ? e : (e.closest('a,button,label,[role=button],input,select,th,td') || e));
+  };
+  const miss = [];
+  const pageW = document.documentElement.scrollWidth;
+  items.forEach(it => {
+    const e = find(it);
+    if (!e) { miss.push(String(it.n) + ':' + (it.text || it.css || (it.any || []).join('/'))); return; }
+    const r = e.getBoundingClientRect(), pad = it.pad == null ? 4 : it.pad;
+    const x = r.left + window.scrollX - pad, y = r.top + window.scrollY - pad;
+    const box = document.createElement('div');
+    box.className = '__mk';
+    box.style.cssText = `position:absolute;left:${x}px;top:${y}px;width:${r.width + pad*2}px;` +
+      `height:${r.height + pad*2}px;border:3px solid #E5484D;border-radius:7px;` +
+      `box-shadow:0 0 0 2px rgba(255,255,255,.85);z-index:2147483646;pointer-events:none;box-sizing:border-box`;
+    const b = document.createElement('div');
+    b.className = '__mk';
+    b.textContent = it.n;
+    // 번호는 상자 왼쪽 위 바깥. 화면 왼쪽 끝이면 안쪽으로
+    const bx = Math.max(2, x - 14), by = Math.max(2, y - 14);
+    b.style.cssText = `position:absolute;left:${bx}px;top:${by}px;width:28px;height:28px;` +
+      `border-radius:50%;background:#E5484D;color:#fff;font:700 15px/28px Pretendard,sans-serif;` +
+      `text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.35),0 0 0 2px #fff;` +
+      `z-index:2147483647;pointer-events:none`;
+    document.body.appendChild(box); document.body.appendChild(b);
+  });
+  return miss;
+}
+"""
+UNMARK_JS = "() => document.querySelectorAll('.__mk').forEach(e => e.remove())"
+
+SHOT_MARKS = True    # shot 단계에 marks: false 를 주면 자동 번호를 그리지 않는다
+AUTO_MARKS = {}      # 이미지 이름 → 자동 번호 목록 (src/*.yaml 의 단계 설명에서 만든다)
+CHIP = re.compile(r"\[([^\[\]]{1,20})\]")
+SKIP_CHIPS = {"별표1"}
+
+
+def load_auto_marks():
+    """매뉴얼 원본(src/*.yaml)의 단계에서 번호 표시를 만든다.
+
+    이미지가 붙은 단계부터 다음 이미지 직전 단계까지가 같은 화면이다.
+    각 단계 설명의 [버튼] 이름 중 화면에 보이는 첫 번째를 그 단계 번호로 표시한다.
+    설명을 고치면 다음 촬영에 번호도 따라 바뀐다 — 따로 맞출 필요가 없다.
+    """
+    out = {}
+
+    def walk(steps):
+        cur = None
+        for s in steps or []:
+            if s.get("image"):
+                cur = s["image"]
+                out.setdefault(cur, [])
+            if not cur:
+                continue
+            act = str(s.get("action", ""))
+            names = []
+            tg = str(s.get("target") or "")
+            m_t = re.match(r"(text|button|tab):(.+)$", tg)
+            if m_t:
+                # 설명에 버튼 이름이 여럿이어도, target 으로 정한 하나만 표시한다 (2026-10-19)
+                no = s.get("no", s.get(False))
+                if no not in (None, ""):
+                    out[cur].append({"n": no, "any": [m_t.group(2).strip()],
+                                     "zone": "nav" if re.search(r"상단|왼쪽|좌측|메뉴에서", act.split("[")[0]) else "main"})
+                continue
+            for c0 in CHIP.findall(act):
+                c0 = c0.strip()
+                if c0 in SKIP_CHIPS:
+                    continue
+                names.append(c0)
+                # [시설 관리 › 세부 시설대장] 같은 경로는 마지막 이름부터 찾는다
+                parts = [p.strip() for p in re.split(r"[›>]", c0) if p.strip()]
+                if len(parts) > 1:
+                    names.extend(reversed(parts))
+            # YAML 1.1 은 키 no 를 False 로 읽는다 — 둘 다 본다
+            no = s.get("no", s.get(False))
+            if not names or no in (None, ""):
+                continue
+            zone = "nav" if re.search(r"상단|왼쪽|좌측|메뉴에서", act.split("[")[0]) else "main"
+            out[cur].append({"n": no, "any": names, "zone": zone})
+
+    for f in sorted((_ROOT / "src").glob("*.yaml")):
+        try:
+            for doc in yaml.safe_load_all(open(f, encoding="utf-8")):
+                for item in doc or []:
+                    if not isinstance(item, dict):
+                        continue
+                    walk(item.get("steps"))
+                    for sf in item.get("sub_flows", []) or []:
+                        walk(sf.get("steps"))
+        except Exception as e:
+            print(f"  ! {f.name} 번호 표시 읽기 실패 ({type(e).__name__})")
+    return out
 
 
 def load_routes():
@@ -504,17 +707,18 @@ def shot(page, name, screen_id, expect, masks, seen, log):
         pass
 
     masked = True
-    for step in (lambda: page.add_style_tag(content=MASK_CSS),
-                 lambda: page.evaluate(MASK_JS)):
-        try:
-            step()
-        except Exception:
-            masked = False
-    if MASK_DATA:
+    # 칸별 가림(휴대폰 번호 글자 바꾸기 포함)을 먼저 한다. 그 뒤 남은 번호만 흐리게 한다 (2026-10-19)
+    if MASK_DATA and ROUTE_MASK_DATA:
         try:
             cnt = page.evaluate(MASK_DATA_JS, [MASK_COLS, MASK_IDS, MASK_KEEP_CHARS])
             if cnt:
                 log.append(f"    자료 {cnt}칸 가림")
+        except Exception:
+            masked = False
+    for step in (lambda: page.add_style_tag(content=MASK_CSS),
+                 lambda: page.evaluate(MASK_JS)):
+        try:
+            step()
         except Exception:
             masked = False
     for sel in masks:
@@ -527,12 +731,46 @@ def shot(page, name, screen_id, expect, masks, seen, log):
         log.append(f"  ! {name} — 마스킹을 적용하지 못했습니다. "
                    f"개인정보가 보이는지 반드시 확인하세요")
 
-    path = OUT / screen_id / name
+    # 번호 표시 — 쌓아 둔 mark 를 그린다. 못 찾은 것은 기록만 하고 촬영은 계속한다
+    marks = list(PENDING_MARKS)
+    PENDING_MARKS.clear()
+    if not marks and SHOT_MARKS:
+        marks = AUTO_MARKS.get(name, [])
+    if marks:
+        try:
+            miss = page.evaluate(MARK_JS, marks)
+            log.append(f"    번호 {len(marks) - len(miss)}개 표시"
+                       + (f" · 못 찾음 {', '.join(miss)}" if miss else ""))
+        except Exception as e:
+            log.append(f"  ! 번호 표시 실패 ({type(e).__name__})")
+
+    # 이름은 routes 에 적힌 .png 그대로 쓰고, 실제 파일은 같은 이름의 .webp 로 저장한다
+    path = (OUT / screen_id / name).with_suffix(".webp")
     path.parent.mkdir(parents=True, exist_ok=True)
     try:
-        page.screenshot(path=str(path), full_page=True)
+        raw = page.screenshot(full_page=SHOT_FULL, type="png")
     except Exception as e:
         log.append(f"  X {name} — 촬영 실패 ({type(e).__name__})")
+        return False
+    finally:
+        try:
+            page.evaluate(UNMARK_JS)
+        except Exception:
+            pass
+    try:
+        import io
+        from PIL import Image
+        im = Image.open(io.BytesIO(raw))
+        if max(im.size) > WEBP_MAX:
+            k = WEBP_MAX / max(im.size)
+            im = im.resize((int(im.width * k), int(im.height * k)), Image.LANCZOS)
+            log.append(f"    긴 화면이라 {int(k*100)}% 로 줄여 저장")
+        im.save(path, "WEBP", quality=WEBP_QUALITY, method=6)
+        old = path.with_suffix(".png")          # 예전 PNG 가 남아 있으면 빌드가 헷갈린다
+        if old.exists():
+            old.unlink()
+    except Exception as e:
+        log.append(f"  X {name} — WebP 저장 실패 ({type(e).__name__}: {e})")
         return False
 
     url = page.url
@@ -546,8 +784,8 @@ def shot(page, name, screen_id, expect, masks, seen, log):
         else:
             log.append(f"    주소는 다릅니다 ({url[-45:]}) — 화면은 갔는데 내용이 같습니다")
         try:
-            path.rename(path.with_name(path.stem + "_확인필요.png"))
-            log.append(f"    확인용으로 남겨둠: {path.stem}_확인필요.png")
+            path.rename(path.with_name(path.stem + "_확인필요.webp"))
+            log.append(f"    확인용으로 남겨둠: {path.stem}_확인필요.webp")
         except Exception:
             pass
         return False
@@ -575,7 +813,8 @@ def run(args):
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=not args.headed)
         ctx = browser.new_context(viewport=VIEWPORT, locale="ko-KR",
-                                  timezone_id="Asia/Seoul")
+                                  timezone_id="Asia/Seoul",
+                                  device_scale_factor=int(cfg.get("scale", SCALE)))
 
         # 이 서비스처럼 조회도 POST 로 하는 곳이 있다.
         # routes.yaml 의 allow_post 에 적힌 조각이 주소에 들어 있으면 통과시킨다.
@@ -614,7 +853,7 @@ def run(args):
             ctx.route("**/*", block)
 
         page = ctx.new_page()
-        page.clock.set_fixed_time(FIXED_TIME)
+        page.clock.set_fixed_time(cfg.get("fixed_time", FIXED_TIME))
 
         # 로그인 — 로그인 요청은 POST이므로 차단 대상에서 잠시 제외한다.
         lg = cfg["login"]
@@ -687,6 +926,7 @@ def run(args):
             log.append("  ! 판정 문구는 못 찾았지만 주소가 바뀌어 로그인된 것으로 봅니다")
 
         if not signed_in:
+            page.wait_for_timeout(1500)   # 경고창이 다 그려질 때까지
             log.append("\n로그인 실패. 아래를 확인하세요.")
             log.append(f"  현재 주소 : {page.url}")
             log.append(f"  아이디 칸 : {'입력됨' if ok_id else '못 찾음'} / "
@@ -704,7 +944,9 @@ def run(args):
                 log.append(f"  화면 저장 : {OUT / '_login_failed.png'}")
             except Exception:
                 pass
+            log.append("  ※ PowerShell 에서 비밀번호는 작은따옴표로 넣으세요: $env:APTOK_PW='비밀번호'")
             print("\n".join(log))
+            save_log(log)
             browser.close()
             return 1
 
@@ -743,9 +985,12 @@ def run(args):
 
         seen = {}
         masks_global = cfg.get("mask_global", [])
+        if cfg.get("auto_marks", True):
+            AUTO_MARKS.update(load_auto_marks())
+            log.append(f"번호 표시: 이미지 {sum(1 for v in AUTO_MARKS.values() if v)}장에 자동 표시")
 
         picked = [r for r in cfg["routes"]
-                  if not args.only or args.only in r["screen_id"]]
+                  if not args.only or any(o.strip() and o.strip() in r["screen_id"] for o in args.only.split(","))]
         if args.only:
             log.append(f"'{args.only}' 이 들어간 화면 {len(picked)}개만 촬영합니다")
 
@@ -753,7 +998,9 @@ def run(args):
           try:
             sid = route["screen_id"]
             masks = masks_global + route.get("mask", [])
+            globals()["ROUTE_MASK_DATA"] = bool(route.get("mask_data", True))
             log.append(f"\n▶ {sid}")
+            PENDING_MARKS.clear()
             ok = True
             expecting_modal = False
             for step in route["steps"]:
@@ -762,6 +1009,8 @@ def run(args):
                     if not ok:
                         failed.append(name)
                         continue
+                    globals()["SHOT_FULL"] = bool(step.get("full", True))
+                    globals()["SHOT_MARKS"] = bool(step.get("marks", True))
                     try:
                         good = shot(page, name, sid, step.get("expect"),
                                     masks, seen, log)
@@ -782,6 +1031,15 @@ def run(args):
                     page.wait_for_timeout(int(val))
                     continue
 
+                if kind == "mark":
+                    # 다음 shot 에 그릴 번호를 쌓는다. 누르지 않는다.
+                    m = dict(val) if isinstance(val, dict) else {"text": str(val)}
+                    if "within" in step and "within" not in m:
+                        m["within"] = step["within"]
+                    m.setdefault("n", len(PENDING_MARKS) + 1)
+                    PENDING_MARKS.append(m)
+                    continue
+
                 if kind == "url":
                     # 주소로 바로 이동한다. 클릭보다 빠르고 잘 안 깨진다.
                     try:
@@ -790,6 +1048,50 @@ def run(args):
                         page.wait_for_timeout(800)
                     except Exception as e:
                         log.append(f"  X {val} 열기 실패 ({type(e).__name__})")
+                        ok = False
+                    continue
+
+                if kind == "expect":
+                    # 이 글자가 보일 때까지 기다리기만 한다. 누르지 않는다.
+                    # (예전에는 아래 click 으로 흘러가 그 글자를 눌러 버렸다 — 2026-10-17 수정)
+                    try:
+                        page.get_by_text(str(val), exact=False).first.wait_for(
+                            state="visible", timeout=8000)
+                    except Exception:
+                        log.append(f"  X '{val}' 가 화면에 보이지 않습니다. 다른 화면입니다")
+                        ok = False
+                    continue
+
+                if kind == "scroll":
+                    # 이 글자가 있는 곳까지 화면을 내린다. 긴 화면의 가운데를 찍을 때 full: false 와 함께 쓴다.
+                    try:
+                        v = str(val)
+                        # "css:선택자" 면 그 요소로, 아니면 보이는 글자로 찾는다(숨은 같은 글자는 건너뜀)
+                        if v.startswith("css:"):
+                            el = page.locator(v[4:]).first
+                        else:
+                            el = page.get_by_text(v, exact=False).locator("visible=true").first
+                        el.wait_for(state="visible", timeout=6000)
+                        # 화면 안쪽 상자가 스크롤되는 페이지도 있어 요소 자체를 위쪽으로 올린다
+                        el.evaluate("e => e.scrollIntoView({block: 'start'})")
+                        page.evaluate("window.scrollBy(0, -140)")
+                        page.wait_for_timeout(600)
+                    except Exception as e:
+                        log.append(f"  X '{val}' 위치로 내리기 실패 ({type(e).__name__})")
+                        ok = False
+                    continue
+
+                if kind == "upload":
+                    # 파일 칸에 파일을 넣는다(창을 띄우지 않는다). 경로는 이 폴더 기준.
+                    # 미리보기(읽기) 요청은 routes.yaml 의 allow_post 로 통과시키고, 저장은 막힌 채로 둔다.
+                    try:
+                        f = Path(str(val))
+                        if not f.is_absolute():
+                            f = BASE / f
+                        page.locator("input[type=file]").first.set_input_files(str(f))
+                        page.wait_for_timeout(1500)
+                    except Exception as e:
+                        log.append(f"  X 파일 '{val}' 올리기 실패 ({type(e).__name__})")
                         ok = False
                     continue
 
@@ -822,6 +1124,77 @@ def run(args):
                         ok = False
                     continue
 
+                if kind == "js":
+                    # 화면 안의 스크립트를 직접 부른다(통화매니저 알림창 열기·목록 거르기 등). 저장·발송하는 함수는 쓰지 않는다.
+                    try:
+                        r = page.evaluate("async () => { " + str(val) + " }")
+                        page.wait_for_timeout(600)
+                        if r not in (None, True, "ok"):
+                            log.append(f"    js: {r}")
+                        if r is False or (isinstance(r, str) and r.startswith("X")):
+                            ok = False
+                    except Exception as e:
+                        log.append(f"  X js 실행 실패 ({type(e).__name__}: {str(e)[:80]})")
+                        ok = False
+                    continue
+
+                if kind == "reg_phone":
+                    # 통화매니저 표에서 이 뒷번호의 [번호 등록] 창을 연다(화면의 onRegPhone 를 그대로 부른다).
+                    # 이미 등록된 번호라 [+ 번호 등록] 칩이 없을 때 쓴다. 창만 열고 저장은 하지 않는다.
+                    try:
+                        r = page.evaluate("""(tail) => {
+                          let el = document.querySelector('tbody');
+                          while (el && !(el.__vue__ && el.__vue__.onRegPhone)) el = el.parentElement;
+                          if (!el) return 'no-vue';
+                          const v = el.__vue__;
+                          const row = (v.list || []).find(x => String(x.peer || x.caller || '').endsWith(tail));
+                          if (!row) return 'no-row';
+                          v.onRegPhone(row); return 'ok';
+                        }""", str(val))
+                        page.wait_for_timeout(800)
+                        if r != "ok":
+                            log.append(f"  X 번호 등록 창 열기 실패 ({r})")
+                            ok = False
+                    except Exception as e:
+                        log.append(f"  X 번호 등록 창 열기 실패 ({type(e).__name__})")
+                        ok = False
+                    continue
+
+                if kind == "only_rows":
+                    # 표에서 이 글자(예: 테스트 휴대폰 뒷번호)가 든 줄만 남기고 나머지 줄을 화면에서 숨긴다.
+                    # 실제 고객 기록이 섞인 목록(통화매니저 등)에서 테스트 기록만 찍을 때 쓴다. 저장되는 것은 없다.
+                    # '!'로 시작하는 글자는 반대로, 그 글자가 든 줄을 숨긴다.
+                    allv = [str(x) for x in (val if isinstance(val, list) else [val])]
+                    keep = [x for x in allv if not x.startswith("!")]
+                    drop = [x[1:] for x in allv if x.startswith("!")]
+                    try:
+                        n = page.evaluate("""([keep, drop]) => {
+                          const rows = [...document.querySelectorAll('tbody tr')].filter(r => r.offsetParent);
+                          let shown = 0;
+                          for (const r of rows) {
+                            const t = r.innerText || '';
+                            if (keep.some(k => t.includes(k)) && !drop.some(k => t.includes(k))) { shown++; } else { r.style.display = 'none'; }
+                          }
+                          // 총 N건 표시와 페이지 번호도 맞춘다
+                          for (const el of document.querySelectorAll('body *')) {
+                            const t = (el.textContent || '').trim();
+                            if (t.length < 14 && /^총\\s*\\d+\\s*건$/.test(t)) {
+                              const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+                              let nd; while ((nd = w.nextNode())) { if (/\\d/.test(nd.nodeValue)) { nd.nodeValue = nd.nodeValue.replace(/\\d+/, String(shown)); break; } }
+                            }
+                          }
+                          document.querySelectorAll('.paging, .pagination, .page_wrap, .pageWrap, .pagenate').forEach(e => e.style.display = 'none');
+                          return shown;
+                        }""", [keep, drop])
+                        log.append(f"    표에서 {n}줄만 남김")
+                        if not n:
+                            log.append("  X 남길 줄이 없습니다 — 테스트 기록을 확인하세요")
+                            ok = False
+                    except Exception as e:
+                        log.append(f"  X 줄 거르기 실패 ({type(e).__name__})")
+                        ok = False
+                    continue
+
                 if kind == "nth_row":
                     ok = click_row(page, val, log) and ok
                 else:
@@ -851,6 +1224,7 @@ def run(args):
             pass
 
     print("\n".join(log))
+    save_log(log)
     print(f"\n촬영 {made}장 · 실패 {len(failed)}장 · 저장 위치 {OUT}")
     if URLS:
         import json as _json
@@ -903,7 +1277,8 @@ def audit():
     # 주석 줄은 세지 않는다 (설명용 예시가 섞이는 것을 막는다)
     body = "\n".join(l for l in raw.splitlines() if not l.lstrip().startswith("#"))
     planned = set(re.findall(r"shot:\s*(\S+\.png)", body))
-    have = {p.name for p in OUT.rglob("*.png")}
+    # 파일은 .webp 로 저장되지만 이름은 routes·원본의 .png 로 맞춰 센다
+    have = {p.name for p in OUT.rglob("*.png")} | {p.stem + ".png" for p in OUT.rglob("*.webp")}
 
     print(f"원본 요구 {len(want)}장 · 경로 정의 {len(planned)}장 · 실제 파일 {len(have)}장\n")
 
@@ -920,6 +1295,19 @@ def audit():
     if not problems:
         print("모두 일치합니다.")
     return 1 if (want - planned) else 0
+
+
+
+def save_log(lines):
+    """콘솔 창을 닫아도 원인을 볼 수 있도록 촬영 기록을 파일로도 남긴다."""
+    try:
+        from datetime import datetime
+        f = Path(__file__).resolve().parent / "capture_log.txt"
+        f.write_text(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "\n" + "\n".join(lines),
+                     encoding="utf-8")
+        print(f"\n기록 파일: {f}")
+    except Exception:
+        pass
 
 
 def safe_run(args):
@@ -939,7 +1327,7 @@ if __name__ == "__main__":
     ap.add_argument("--allow-write", action="store_true",
                     help="쓰기 요청 차단을 푼다. 테스트 단지에서만 사용")
     ap.add_argument("--only", default=None,
-                    help="화면 id 에 이 글자가 들어간 것만 촬영한다 (예: --only rpt)")
+                    help="화면 id 에 이 글자가 들어간 것만 촬영한다. 쉼표로 여러 개 (예: --only rpt,ltrp)")
     ap.add_argument("--audit", action="store_true",
                     help="촬영하지 않고, 원본이 요구하는 이미지와 실제 파일을 대조만 한다")
     a = ap.parse_args()

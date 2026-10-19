@@ -9,11 +9,14 @@
 secrets/
 azuer.txt
 *.log
+*.conf
 
 # OS & Temp Files
 .DS_Store
 Thumbs.db
 *.tmp
+__pycache__/
+*.bak*
 
 # aptok_manual temporary & internal working files
 aptok_manual/*.zip
@@ -23,5 +26,13 @@ aptok_manual/review.html
 aptok_manual/아파트ok-작업정리.md
 aptok_manual/pitfalls.md
 aptok_manual/_backup*
+aptok_manual/_review/
+aptok_manual/testdata/
+aptok_manual/*.txt
+aptok_manual/*.ps1
+aptok_manual/*작업계획*
+aptok_manual/captures/_login_failed.png
+aptok_manual/captures/**/*확인필요*
+
 
 

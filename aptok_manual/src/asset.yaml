@@ -8,23 +8,48 @@
   pattern: A
   inherits: pattern-a
   permission: 자산관리 > 열람
-  draft: true                     # 화면 확인 전 뼈대
-  purpose: null                   # 확인필요: 이 화면이 무엇을 하는 화면인지
+  purpose: 관리사무소 저장품(전용)의 입고·출고와 재고를 관리한다
+
+  key_concept: 소모성 자재(전구·필터·패킹·제설제 등)를 품목별로 등록하고, 들어오고 나갈 때마다 입고·출고를 기록한다. 목록의 재고는 입고에서 출고를 뺀 값이다. 입출고는 결재를 거친다.
+  columns:
+  - 품목명
+  - 입고
+  - 출고
+  - 재고
+  - 관리자[정]
+  - 관리자[부]
+  - 결재현황
+  screen_specific:
+  - name: 검색 기준
+    desc: 품목명·모델명·구입처명·관리자명·보관장소로 찾습니다. [상세검색]으로 조건을 더 넣습니다.
+  - name: 저장품목등록
+    desc: 새 품목을 만들고 첫 입고 수량을 넣습니다.
+  - name: 엑셀 등록
+    desc: 여러 품목을 엑셀로 한 번에 올립니다.
 
   steps:
     - no: 1
       action: 상단 [자산관리]를 클릭한 뒤 왼쪽 목록에서 [저장품(전용)]를 클릭합니다.
       target: nav:자산관리 > side:저장품(전용)
       image: asset-stock-private-01.png
-      note: null
+      note: 품목별 입고·출고·재고가 나옵니다. 재고 머리글을 누르면 재고순으로 정렬됩니다.
     - no: 2
       action: 검색·기간·내려받기 등 기본 조작은 [목록 화면 공통 사용법]을 따릅니다.
       target: null
       image: null
       note: null
+    - 'no': 3
+      action: '[저장품목등록]을 눌러 품목명·규격·보관장소·관리자를 넣고 입고 수량을 적어 등록합니다.'
+      target: button:저장품목등록
+      image: null
+      note: null
+    - 'no': 4
+      action: 품목을 눌러 입고·출고를 추가합니다.
+      target: null
+      image: null
+      note: 출고할 때 사용처를 적어 두면 일지나 보고서의 근거가 됩니다.
 
-  cautions:
-    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+  cautions: []
 
   faq: []
 
@@ -36,23 +61,48 @@
   pattern: A
   inherits: pattern-a
   permission: 자산관리 > 열람
-  draft: true                     # 화면 확인 전 뼈대
-  purpose: null                   # 확인필요: 이 화면이 무엇을 하는 화면인지
+  purpose: 관리사무소 저장품(공용)의 입고·출고와 재고를 관리한다
+
+  key_concept: 소모성 자재(전구·필터·패킹·제설제 등)를 품목별로 등록하고, 들어오고 나갈 때마다 입고·출고를 기록한다. 목록의 재고는 입고에서 출고를 뺀 값이다. 입출고는 결재를 거친다.
+  columns:
+  - 품목명
+  - 입고
+  - 출고
+  - 재고
+  - 관리자[정]
+  - 관리자[부]
+  - 결재현황
+  screen_specific:
+  - name: 검색 기준
+    desc: 품목명·모델명·구입처명·관리자명·보관장소로 찾습니다. [상세검색]으로 조건을 더 넣습니다.
+  - name: 저장품목등록
+    desc: 새 품목을 만들고 첫 입고 수량을 넣습니다.
+  - name: 엑셀 등록
+    desc: 여러 품목을 엑셀로 한 번에 올립니다.
 
   steps:
     - no: 1
       action: 상단 [자산관리]를 클릭한 뒤 왼쪽 목록에서 [저장품(공용)]를 클릭합니다.
       target: nav:자산관리 > side:저장품(공용)
       image: asset-stock-common-01.png
-      note: null
+      note: 품목별 입고·출고·재고가 나옵니다. 재고 머리글을 누르면 재고순으로 정렬됩니다.
     - no: 2
       action: 검색·기간·내려받기 등 기본 조작은 [목록 화면 공통 사용법]을 따릅니다.
       target: null
       image: null
       note: null
+    - 'no': 3
+      action: '[저장품목등록]을 눌러 품목명·규격·보관장소·관리자를 넣고 입고 수량을 적어 등록합니다.'
+      target: button:저장품목등록
+      image: null
+      note: null
+    - 'no': 4
+      action: 품목을 눌러 입고·출고를 추가합니다.
+      target: null
+      image: null
+      note: 출고할 때 사용처를 적어 두면 일지나 보고서의 근거가 됩니다.
 
-  cautions:
-    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+  cautions: []
 
   faq: []
 
@@ -64,23 +114,44 @@
   pattern: A
   inherits: pattern-a
   permission: 자산관리 > 열람
-  draft: true                     # 화면 확인 전 뼈대
-  purpose: 관리사무소가 보유한 공구와 기구를 관리한다
+  purpose: 공기구(휴대용 발전기·토크렌치·절연저항계 등)를 관리번호로 등록하고 감가상각과 폐기를 관리한다
+
+  key_concept: 물품마다 관리번호가 붙는다. 구매단가·수량·구매일을 넣으면 감가상각비가 계산되고, 쓰지 않게 되면 폐기일을 넣어 목록에서 정리한다.
+  columns:
+  - 관리번호
+  - 품목명
+  - 규격
+  - 구매단가
+  - 수량
+  - 구매일
+  - 감가상각(게시일·만료일·감가상각비)
+  - 폐기일
+  screen_specific:
+  - name: 폐기품목 포함
+    desc: 켜면 폐기한 물품도 함께 봅니다.
+  - name: 분류설정
+    desc: 물품 분류를 만들고 정리합니다.
+  - name: 엑셀 등록
+    desc: 여러 물품을 엑셀로 한 번에 올립니다.
 
   steps:
     - no: 1
       action: 상단 [자산관리]를 클릭한 뒤 왼쪽 목록에서 [공기구]를 클릭합니다.
       target: nav:자산관리 > side:공기구
       image: asset-tools-01.png
-      note: null
+      note: 물품 목록입니다. 품목명을 누르면 상세 정보가 열립니다.
     - no: 2
       action: 검색·기간·내려받기 등 기본 조작은 [목록 화면 공통 사용법]을 따릅니다.
       target: null
       image: null
       note: null
+    - 'no': 3
+      action: '[등록]을 눌러 품목명·규격·구매단가·수량·구매일과 보관장소를 넣고 저장합니다.'
+      target: button:등록
+      image: null
+      note: null
 
-  cautions:
-    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+  cautions: []
 
   faq: []
 
@@ -92,23 +163,43 @@
   pattern: A
   inherits: pattern-a
   permission: 자산관리 > 열람
-  draft: true                     # 화면 확인 전 뼈대
-  purpose: 사무용 집기와 비품을 관리한다
+  purpose: 집기비품(사무용 책상·복합기·노트북 등)를 관리번호로 등록하고 감가상각과 폐기를 관리한다
+
+  key_concept: 물품마다 관리번호가 붙는다. 구매단가·수량·구매일을 넣으면 감가상각비가 계산되고, 쓰지 않게 되면 폐기일을 넣어 목록에서 정리한다.
+  columns:
+  - 관리번호
+  - 품목명
+  - 규격
+  - 구매단가
+  - 수량
+  - 구매일
+  - 감가상각(게시일·만료일·감가상각비)
+  - 폐기일
+  screen_specific:
+  - name: 폐기품목 포함
+    desc: 켜면 폐기한 물품도 함께 봅니다.
+  - name: 분류설정
+    desc: 물품 분류를 만들고 정리합니다.
+  - name: 엑셀 등록
+    desc: 여러 물품을 엑셀로 한 번에 올립니다.
 
   steps:
     - no: 1
-      action: 상단 [자산관리]를 클릭한 뒤 왼쪽 목록에서 [집기비품]를 클릭합니다.
+      action: 상단 [자산관리]를 클릭한 뒤 왼쪽 목록에서 [집기비품]을 클릭합니다.
       target: nav:자산관리 > side:집기비품
       image: asset-furniture-01.png
-      note: null
+      note: 물품 목록입니다. 품목명을 누르면 상세 정보가 열립니다.
     - no: 2
       action: 검색·기간·내려받기 등 기본 조작은 [목록 화면 공통 사용법]을 따릅니다.
       target: null
       image: null
       note: null
+    - 'no': 3
+      action: '[등록]을 눌러 품목명·규격·구매단가·수량·구매일과 보관장소를 넣고 저장합니다.'
+      target: button:등록
+      image: null
+      note: null
 
-  cautions:
-    []   # 확인필요: 되돌릴 수 없는 동작이 있는지
+  cautions: []
 
   faq: []
-

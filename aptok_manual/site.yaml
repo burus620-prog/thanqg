@@ -1,4 +1,4 @@
-title: 아파트ok 사용자 매뉴얼
+title: 아파트OK 매뉴얼
 subtitle: 공동주택관리 플랫폼 · 관리사무소 업무용
 
 # 목차에 나올 상단 메뉴 순서
@@ -11,6 +11,8 @@ menu_order:
   - 입주자관리
   - 인사관리
   - 입찰계약
+  - 장기수선계획
+  - 이용요금·결제
 
 # 좌측 목차에서 처음부터 펼쳐 둘 대분류.
 # 여기 없는 대분류는 접힌 채로 시작하고, 누르면 열린다.
@@ -29,10 +31,37 @@ screen_order:
     - cs-call-hist              # 통화매니저 > 통화 이력
     - cs-sms-hist               # 통화매니저 > 문자 이력
     - cs-svc-req                # 통화매니저 > 서비스 신청·현황
+    - cs-line-apply             # 통화매니저 > 회선 신청 (2026-10)
     - cs-setting                # 통화매니저 > 설정
     - cs-msg-sent               # 메시지 관리 > 발송 내역
+    - cs-msg-send               # 메시지 관리 > 메시지 발송 (2026-10)
+    - cs-msg-template           # 메시지 관리 > 템플릿 관리 (2026-10)
     - cs-survey                 # 설문 관리
     - cs-survey-form            # 설문 관리 > 설문 등록
     - cs-survey-detail          # 설문 관리 > 설문 상세·결과
     - cs-stat                   # 민원통계
     - cs-eval                   # 민원평가현황
+  장기수선계획:
+    - ltrp-history              # 조정 이력 (출발점)
+    - ltrp-onboard              # 전기 계획 개통
+    - ltrp-adhoc                # 수시조정 등록
+    - ltrp-compare              # 조정 전·후 대비표
+    - ltrp-info                 # 조정안 1 단지 기본정보
+    - ltrp-rules                # 조정안 2 총론
+    - ltrp-review               # 조정안 3 검토서
+    - ltrp-summary              # 조정안 4 총괄표 + 6 마감
+    - ltrp-3yr                  # 조정안 5 3년 이내 공사
+    - ltrp-worktype             # 시설 관리 > 공사종별 설정
+    - ltrp-ledger               # 시설 관리 > 장기수선계획 시설대장
+    - ltrp-facility             # 시설 관리 > 세부 시설대장
+    - ltrp-usage                # 적립·사용현황
+  전자결재:
+    - appr-draft                # 기안품의
+    - fac-expense-list          # 시설보수 지출품의 (2026-10)
+    - fac-expense-form          # 시설보수 지출품의 작성 (2026-10)
+
+# 잠시 그림·절차를 내리고 안내만 보일 화면 (2026-10-19)
+# 통화매니저는 테스트 단지에 개통 전이라 화면이 「열람 권한이 없습니다」로 찍힌다.
+# 개통하고 다시 찍은 뒤 이 목록에서 빼면 원래 설명이 그대로 나온다.
+on_hold:
+  cs-stat: 민원통계 화면은 준비 중입니다.
